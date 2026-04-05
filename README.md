@@ -1,5 +1,7 @@
 # jp-form-kit
 
+[English](./README.md) | [日本語](./README.ja.md)
+
 `jp-form-kit` is a TypeScript package for Japanese government PDF forms.
 
 It ships:
