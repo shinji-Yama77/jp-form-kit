@@ -1,6 +1,6 @@
-# jp-form-schemas
+# jp-form-kit
 
-`jp-form-schemas` is a TypeScript library of typed overlay schemas for Japanese government PDF forms.
+`jp-form-kit` is a TypeScript library of typed overlay schemas for Japanese government PDF forms.
 
 It is designed for apps that need to prefill or review flat PDF forms by drawing text at known `x/y` coordinates. The package publishes form metadata, field definitions, and TypeScript types. It does not ship a PDF renderer or overlay engine.
 
@@ -20,13 +20,13 @@ It is designed for apps that need to prefill or review flat PDF forms by drawing
 ## Installation
 
 ```bash
-npm install jp-form-schemas
+npm install jp-form-kit
 ```
 
 ## Quick Example
 
 ```ts
-import { allForms, type OverlayFormSchema } from "jp-form-schemas";
+import { allForms, type OverlayFormSchema } from "jp-form-kit";
 
 const form: OverlayFormSchema | undefined = allForms.find(
   (schema) => schema.id === "juminhyo",

@@ -1,351 +1,218 @@
-# jp-form-schemas — Project Plan
+# jp-form-kit — Project Plan
 
-## What this is
+## What This Is
 
-An open-source TypeScript npm package: a community-maintained registry of Japanese government form schemas with a PDF coordinate overlay toolkit. Anyone can contribute a schema for a new form by following the authoring workflow, and the package stays useful across apps.
+`jp-form-kit` is an open-source TypeScript npm package for Japanese government PDF forms.
 
-Extracted from [SmartLayer/unidentity](https://github.com/shinchan/unidentity) where the schemas were app-specific. The goal is to decouple the schemas from any single app so they can be maintained by contributors who know the forms.
+The v1 goal is no longer a pure schema registry. The package should ship:
+
+- canonical form schemas
+- a Node-first PDF overlay engine
+- deterministic local PDF asset resolution owned by the app/package setup
+
+This project was extracted from app-specific code so the schema definitions and overlay behavior can be maintained in one reusable package instead of being buried inside a single app.
+
+---
+
+## v1 Direction
+
+### Product shape
+
+For v1, `jp-form-kit` stays as one package.
+
+It should expose:
+
+- form schemas and schema types
+- `allForms`
+- a generic overlay engine that can render text onto the correct blank form PDF in Node
+
+It should not require consumers to manually choose an arbitrary blank PDF in normal usage. The engine should resolve the expected PDF using known schema metadata and a controlled local asset directory.
+
+### Scope
+
+v1 should prioritize completeness over breadth:
+
+- ship 2-3 high-value forms end-to-end
+- prove schema format, asset resolution, and rendering flow
+- keep browser support out of scope for now
+- add more forms only after the engine/package shape is stable
 
 ---
 
 ## Goals for v1
 
-- Publish to npm as `jp-form-schemas`
-- Ship 5–6 verified Minato ward forms as the seed dataset
-- Establish a contributor workflow that produces consistent, verifiable schemas
-- Zero runtime dependencies in the published package (types + plain objects only)
-- Schema data is independent of any vault, auth, or app logic
+- Publish to npm as `jp-form-kit`
+- Keep schema exports available from the package root
+- Keep `allForms` available from the package root
+- Add a Node-first overlay engine to the same package
+- Support deterministic local PDF resolution using schema metadata such as `pdfFilename`
+- Produce a usable overlaid PDF for 2-3 verified forms
+- Keep contributor workflows for coordinate mapping and verification documented
+
+### Explicit non-goals for v1
+
+- No browser-first API
+- No bundled official PDFs in the npm package
+- No monorepo split into separate schema and engine packages
+- No requirement for users to supply arbitrary blank PDFs in the default flow
 
 ---
 
-## Repo structure
+## High-Level Repo Shape
 
-```
-jp-form-schemas/
+```text
+jp-form-kit/
   src/
-    types.ts                  core TypeScript types
+    index.ts                 public package entry
+    types.ts                 canonical schema types
     forms/
+      index.ts               re-exports forms + allForms
       minato/
-        juminhyo.ts           住民票等請求書 ✓
-        tenin.ts              転入届 ✓
-        kokumin-nenkin.ts     国民年金加入申請 (todo)
-        kenko-hoken.ts        健康保険加入申請 (todo)
-        zairyu-koushin.ts     在留カード更新申請 (todo)
-        mynumber.ts           マイナンバーカード申請 (todo)
-        index.ts              re-exports all minato forms
-      index.ts                re-exports all forms + allForms array
-    index.ts                  public package entry point
+        index.ts
+        juminhyo.ts
+        tenin.ts
+        ...                  at most 1 additional v1 form
+    engine/
+      index.ts               engine public exports
+      render.ts              core overlay rendering
+      resolve-pdf.ts         local asset resolution
+      errors.ts              runtime error helpers/messages
   scripts/
-    extract-coords.mjs        reads Preview annotations → prints x/y midpoints
-    coord-picker.html         browser canvas tool — click to record coordinates
-    inspect-pdf.mjs           checks whether PDF has AcroForm fields or is flat
-    test-overlay.mjs          draws bounding boxes on PDF to verify alignment
-  package.json
-  tsconfig.json
-  tsconfig.build.json
-  .gitignore
-  .npmignore
+    extract-coords.mjs
+    coord-picker.html
+    inspect-pdf.mjs
+    test-overlay.mjs
   README.md
   CONTRIBUTING.md
   AGENTS.md
-  PLAN.md                     (this file)
-  LICENSE
+  PLAN.md
 ```
+
+### Asset strategy
+
+- Blank source PDFs are not committed to npm package output for v1
+- Blank source PDFs live in a controlled local asset directory owned by the app or local setup
+- Engine resolution should use schema metadata and a known asset root, not arbitrary user-chosen PDFs
+- PDF redistribution is deferred until legal and packaging questions are explicitly resolved
 
 ---
 
-## Types (src/types.ts)
+## Public API Direction
 
-These are the canonical types for the package. No dependencies — pure TypeScript.
+The package root should continue to export schema types and form definitions.
 
-```typescript
-export type FormCategory =
-  | "ward"
-  | "immigration"
-  | "pension"
-  | "employment"
-  | "banking"
-  | "housing";
+### Existing exports to preserve
 
-export interface OverlayField {
-  key: string;           // unique key within this form (used as lookup in value map)
-  x: number;            // x coordinate in PDF points, bottom-left origin
-  y: number;            // y coordinate in PDF points
-  size?: number;        // font size override (default: 9)
-  vaultKey?: string;    // if key is a split subfield (e.g. dob_year), the source data key (e.g. "dob")
-  labelEn?: string;     // English label — shown in review UIs
-  labelJa?: string;     // Japanese label — shown in review UIs
-  required?: boolean;
-}
+- `allForms`
+- `FormCategory`
+- `OverlayField`
+- `FormVariant`
+- `OverlayFormSchema`
+- individual schema exports
 
-export interface OverlayFormSchema {
-  id: string;                   // kebab-case, unique across all schemas
-  titleJa: string;              // official Japanese form title
-  titleEn: string;              // English translation
-  pdfFilename: string;          // just the filename (e.g. "juminhyo.pdf") — consumer app controls the path
-  downloadName: string;         // suggested filename for the exported PDF
-  sourceUrl: string;            // real government URL — must be verifiable
-  category: FormCategory;
-  jurisdiction: string;         // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau", "smbc"
-  lastVerifiedAt: string;       // ISO 8601 date (YYYY-MM-DD)
-  verificationLocation: string; // human-readable — e.g. "港区役所 official website — city.minato.tokyo.jp"
-  warningThresholdDays: number; // days before consuming apps show a staleness warning
-  description: string;          // one-line English description
-  fields: OverlayField[];
-}
-// Dropped from original SmartLayer schema:
-//   free: boolean — app-specific pricing tier, has no meaning in a general package
-//   pdfUrl: string — replaced by pdfFilename; consumer app controls the base path
-```
+### New engine exports to add
+
+The package should add an engine entry point that supports either a schema id or a schema object plus a values map.
+
+The intended API shape is:
+
+- a core function that generates PDF bytes in Node
+- a thin helper that optionally writes those bytes to disk
+- optional engine options for things like asset root and font path/bytes
+
+### Core behavior
+
+The engine should:
+
+1. resolve the schema if given a schema id
+2. resolve the matching blank PDF from a known local asset root
+3. load a Japanese-capable font
+4. draw all non-empty mapped values onto the PDF using schema coordinates
+5. return generated PDF bytes
+
+### Design constraints
+
+- core generator should not depend on DOM APIs
+- default path should be Node-oriented and file-system-friendly
+- error messages should clearly explain missing asset files, missing fonts, and unknown schema ids
+- asset resolution should be deterministic and based on package/app configuration, not ad hoc caller choices
 
 ---
 
-## Schema authoring workflow
+## Runtime and Dependency Direction
 
-This is how a contributor goes from "I have a PDF" to a merged PR.
+The old “zero runtime dependencies” promise no longer applies to the package if the engine ships in v1.
 
-### Prerequisites
+The revised package direction is:
 
-```bash
-npm install          # installs pdfjs-dist, pdf-lib, fontkit for scripts
-```
+- schema definitions remain plain typed data
+- the overlay engine introduces runtime PDF dependencies
+- contributor scripts stay separate from runtime engine code
 
-### Step 1 — Obtain the official PDF
-
-- Download the form from the official ward/institution website
-- Record the exact URL — this becomes `sourceUrl` in the schema
-- Name the file `{form-id}.pdf` (e.g. `kenko-hoken.pdf`)
-- Do NOT commit the PDF to the repo — link to `sourceUrl` instead
-
-### Step 2 — Check if the PDF has AcroForm fields
-
-```bash
-node scripts/inspect-pdf.mjs path/to/form.pdf
-```
-
-- If it has AcroForm fields: those field names and positions can be used directly
-- If it's flat (most Japanese government PDFs are): proceed to step 3
-
-### Step 3 — Annotate field positions in macOS Preview
-
-1. Open the PDF in macOS Preview
-2. For each form field you want to map, use **Tools → Annotate → Text** to place a text box directly on top of the field
-3. Type the field key name inside the text box (e.g. `name`, `dob_year`, `address`)
-4. Save the PDF (keep it separate from the clean source — e.g. `kenko-hoken_annotated.pdf`)
-
-### Step 4 — Extract coordinates
-
-```bash
-node scripts/extract-coords.mjs path/to/kenko-hoken_annotated.pdf
-```
-
-This prints all annotation rects as `[x1, y1, x2, y2]`.
-
-The overlay x/y for each field is the **bottom-left corner** of the annotation box:
-- `x = x1`
-- `y = y1`
-
-Or use the midpoint if you prefer centering:
-- `x = Math.round((x1 + x2) / 2)`
-- `y = Math.round((y1 + y2) / 2)`
-
-The existing schemas use single-point placement (text drawn from a single x/y). Use whichever gives clean alignment when you verify in step 6.
-
-**Alternative: use the coord picker**
-
-Open `scripts/coord-picker.html` in a browser, load the clean PDF, and click each field to record coordinates. Export as JSON. This skips the Preview annotation step.
-
-### Step 5 — Write the TypeScript schema
-
-Create `src/forms/{ward-or-institution}/{form-id}.ts`:
-
-```typescript
-import type { OverlayFormSchema } from "../../types";
-
-export const kenkohokenSchema: OverlayFormSchema = {
-  id: "kenko-hoken",
-  titleJa: "健康保険加入申請書",
-  titleEn: "National health insurance enrollment",
-  pdfFilename: "kenko-hoken.pdf",
-  downloadName: "kenko-hoken.pdf",
-  sourceUrl: "https://www.city.minato.tokyo.jp/...",
-  category: "pension",
-  jurisdiction: "minato-ku",
-  lastVerifiedAt: "2026-04-05",
-  verificationLocation: "港区役所 official website — city.minato.tokyo.jp",
-  warningThresholdDays: 180,
-  description: "Enroll in national health insurance at your local ward office",
-  fields: [
-    { key: "name",      x: 111, y: 697, labelEn: "Full Name",       labelJa: "氏名",    required: true },
-    { key: "furigana",  x: 93,  y: 725, labelEn: "Name (Katakana)", labelJa: "フリガナ" },
-    { key: "dob_year",  vaultKey: "dob", x: 192, y: 631, labelEn: "Date of Birth", labelJa: "生年月日", required: true },
-    { key: "dob_month", vaultKey: "dob", x: 264, y: 631 },
-    { key: "dob_day",   vaultKey: "dob", x: 315, y: 631 },
-    { key: "address",   x: 144, y: 664, labelEn: "Address",         labelJa: "住所",    required: true },
-  ],
-};
-```
-
-### Step 6 — Verify with test-overlay
-
-```bash
-node scripts/test-overlay.mjs path/to/source.pdf path/to/output.pdf
-```
-
-This draws red bounding boxes at each field coordinate so you can see if alignment is correct. Open the output PDF and confirm every box lands on the right field.
-
-**This output PDF is required for your PR** — attach it to prove alignment.
-
-### Step 7 — Wire up exports
-
-Add your schema to `src/forms/minato/index.ts` (or create a new ward folder) and to `src/forms/index.ts`.
-
-### Step 8 — Submit PR
-
-PR must include:
-- [ ] The `.ts` schema file
-- [ ] Updated `index.ts` exports
-- [ ] `sourceUrl` pointing to the real government page
-- [ ] `lastVerifiedAt` set to today
-- [ ] Test-overlay output PDF attached to the PR description (not committed to repo)
-- [ ] Brief note on which ward office and date you verified the form
+This means the package should be described as a schema library plus canonical renderer, not a types-only package.
 
 ---
 
-## package.json
+## Contributor Workflow
 
-```json
-{
-  "name": "jp-form-schemas",
-  "version": "0.1.0",
-  "description": "TypeScript schema library and PDF overlay toolkit for Japanese government forms",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": ["dist"],
-  "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "typescript": "^5.4.0",
-    "pdfjs-dist": "^4.0.0",
-    "pdf-lib": "^1.17.1",
-    "@pdf-lib/fontkit": "^1.1.1"
-  },
-  "keywords": ["japan", "japanese", "forms", "pdf", "schema", "ward", "bureaucracy", "gaijin"],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/shinchan/jp-form-schemas"
-  }
-}
-```
+The coordinate authoring workflow remains important and should stay documented.
 
-Note: `pdfjs-dist`, `pdf-lib`, and `fontkit` are devDependencies only — they're used by contributor scripts, not the published package. The published `dist/` folder is pure TypeScript compiled to JS with no dependencies.
+### Current workflow to preserve
+
+1. obtain the official blank PDF from the official source
+2. inspect whether it is AcroForm or flat
+3. map coordinates using Preview annotations or the coord picker
+4. verify placement with the test overlay script
+5. add or update the schema in `src/forms/`
+
+### Contributor expectations
+
+- coordinates must come from the documented workflow, not guesswork
+- `sourceUrl` must be a real official source URL
+- `lastVerifiedAt` should only be updated after real verification
+- verification docs and contributor docs should stay aligned with the engine-enabled package direction
 
 ---
 
-## tsconfig.json (for development/typecheck)
+## Acceptance Criteria
 
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "outDir": "./dist",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
-  },
-  "include": ["src"]
-}
-```
+The project is ready for v1 when all of the following are true:
 
-## tsconfig.build.json (for publishing — excludes scripts)
+- `npm run typecheck` passes
+- `npm run build` produces a usable package
+- 2-3 forms are fully wired end-to-end through the engine
+- given a schema id and values, the engine can resolve the correct local blank PDF and generate an overlay PDF in Node
+- the generated output uses a Japanese-capable font
+- all non-empty mapped fields are drawn using the schema coordinates
+- coordinate verification workflow remains documented
+- `README.md` and `CONTRIBUTING.md` match the actual package direction
 
-```json
-{
-  "extends": "./tsconfig.json",
-  "exclude": ["scripts", "node_modules"]
-}
-```
+### Minimum smoke scenarios
+
+- generate overlay PDF for `juminhyo`
+- generate overlay PDF for `tenin`
+- fail clearly when the expected local source PDF is missing
+- fail clearly when required font configuration is missing
+- fail clearly when a schema id is unknown
 
 ---
 
-## .npmignore
+## Versioning Direction
 
-```
-scripts/
-src/
-*.ts
-!dist/
-tsconfig*.json
-PLAN.md
-CONTRIBUTING.md
-AGENTS.md
-```
+- Patch: add a form, fix coordinates, update verification metadata, improve runtime behavior without breaking API
+- Minor: add optional schema fields, add engine options, add non-breaking API surface
+- Major: rename/remove exported types, rename existing schema field keys, or break engine API expectations
+
+Renaming a published field key is still a breaking change.
 
 ---
 
-## Versioning policy
+## Assumptions and Defaults
 
-- **Patch** (`0.1.x`) — adding new form schemas, updating `lastVerifiedAt`, fixing coordinates
-- **Minor** (`0.x.0`) — adding new types/fields to `OverlayField` or `OverlayFormSchema`, new form categories
-- **Major** (`x.0.0`) — breaking changes to type definitions that require consumer app updates
-
-Adding a new form schema is always a non-breaking patch. Renaming a field key in an existing schema is a major change (consumer apps that reference that key by name will break).
-
----
-
-## Staleness policy
-
-Japanese government forms change. Any schema where `lastVerifiedAt` is older than `warningThresholdDays` should show a warning in consuming apps. The package itself doesn't enforce this — it's metadata for apps to act on.
-
-Contributors are encouraged (but not required) to re-verify forms they know have changed and submit update PRs. When updating coordinates for an existing form, bump the patch version.
-
----
-
-## v1 forms checklist
-
-| Form | Japanese | Status | Category |
-|------|----------|--------|----------|
-| Resident record request | 住民票等請求書 | ✅ done | ward |
-| Move-in notification | 転入届 | ✅ done | ward |
-| Health insurance enrollment | 健康保険加入申請 | ⬜ todo | pension |
-| National pension enrollment | 国民年金加入申請 | ⬜ todo | pension |
-| Residence card renewal | 在留カード更新申請 | ⬜ todo | immigration |
-| My Number Card application | マイナンバーカード申請 | ⬜ todo | ward |
-
-Target: all 6 done before first npm publish (`0.1.0`).
-
----
-
-## GitHub setup
-
-- **Branch protection on `main`**: require PR + 1 approval (can be self-review for now)
-- **PR template**: checklist of required items (schema file, exports wired, sourceUrl, lastVerifiedAt, overlay PDF attached)
-- **Issue templates**: "New form request" (ward + form name + source URL) and "Schema outdated" (form ID + what changed)
-- **Topics**: `japan`, `japanese-forms`, `pdf`, `typescript`, `npm-package`, `minato`, `bureaucracy`
-
----
-
-## First publish checklist
-
-- [ ] All 6 v1 forms authored and verified
-- [ ] `npm run build` produces clean `dist/`
-- [ ] `npm pack` to inspect what gets published — confirm only `dist/` + `README.md` + `LICENSE`
-- [ ] Create npm account / org if needed
-- [ ] `npm publish --access public`
-- [ ] Tag release `v0.1.0` in GitHub
-- [ ] Update unidentity README to link to this package
+- Package name stays `jp-form-kit`
+- v1 stays as one package
+- runtime target is Node first
+- blank source PDFs are resolved from controlled local assets
+- PDFs are not bundled into npm for v1
+- PDF redistribution is deferred
+- v1 should stop at 2-3 excellent forms rather than stretching to broad coverage

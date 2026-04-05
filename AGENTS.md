@@ -6,7 +6,7 @@ This file tells Claude Code (and other AI coding agents) how this repo works, wh
 
 ## What this repo is
 
-`jp-form-schemas` is a TypeScript npm package. It contains:
+`jp-form-kit` is a TypeScript npm package. It contains:
 
 1. **TypeScript types** — `OverlayFormSchema`, `OverlayField`, `FormCategory` in `src/types.ts`
 2. **Form schemas** — plain TypeScript objects describing the fields of Japanese government forms, organized by ward/institution under `src/forms/`

@@ -1,4 +1,4 @@
-# Contributing to jp-form-schemas
+# Contributing to jp-form-kit
 
 Anyone can contribute a new form schema. A schema is a TypeScript file that describes the fields of a Japanese government PDF form and the x/y coordinates where text should be drawn. No backend, no app logic — just data.
 
