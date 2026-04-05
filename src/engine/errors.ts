@@ -1,8 +1,8 @@
 export class MissingPdfError extends Error {
-  constructor(pdfFilename: string, assetRoot: string) {
+  constructor(pdfFilename: string, expectedPath: string) {
     super(
-      `Missing blank PDF: "${pdfFilename}" not found in asset root "${assetRoot}".\n` +
-      `Download the blank form from the schema's sourceUrl and place it at: ${assetRoot}/${pdfFilename}`
+      `Missing blank PDF: "${pdfFilename}" not found at "${expectedPath}".\n` +
+      `Download the blank form from the schema's sourceUrl and place it at that exact path.`
     );
     this.name = "MissingPdfError";
   }
