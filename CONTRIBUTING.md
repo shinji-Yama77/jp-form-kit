@@ -66,27 +66,42 @@ Create `src/forms/{jurisdiction}/{form-id}.ts`. Copy this template:
 import type { OverlayFormSchema } from "../../types.js";
 
 export const myFormSchema: OverlayFormSchema = {
-  id: "my-form-id",           // kebab-case, unique across all schemas
+  id: "my-form-id", // kebab-case, unique across all schemas
   titleJa: "申請書",
   titleEn: "English title",
   pdfFilename: "my-form.pdf", // filename only — consumer app controls the path
   downloadName: "my-form.pdf",
-  sourceUrl: "https://...",   // real URL where you downloaded the PDF
-  category: "ward",           // see FormCategory in src/types.ts
-  jurisdiction: "minato-ku",  // see jurisdiction slugs below
+  sourceUrl: "https://...", // real URL where you downloaded the PDF
+  category: "ward", // see FormCategory in src/types.ts
+  jurisdiction: "minato-ku", // see jurisdiction slugs below
   lastVerifiedAt: "2026-04-05",
   verificationLocation: "港区役所 official website — city.minato.tokyo.jp",
   warningThresholdDays: 180,
   description: "One-line English description",
   fields: [
-    { key: "name",     x: 111, y: 697, labelEn: "Full Name", labelJa: "氏名", required: true },
-    { key: "dob_year", vaultKey: "dob", x: 192, y: 631, labelEn: "Date of Birth", labelJa: "生年月日" },
+    {
+      key: "name",
+      x: 111,
+      y: 697,
+      labelEn: "Full Name",
+      labelJa: "氏名",
+      required: true,
+    },
+    {
+      key: "dob_year",
+      vaultKey: "dob",
+      x: 192,
+      y: 631,
+      labelEn: "Date of Birth",
+      labelJa: "生年月日",
+    },
     // ...
   ],
 };
 ```
 
 **Field key rules:**
+
 - `key` must be unique within this form
 - If a field maps to a sub-part of a data value (e.g. splitting a date into year/month/day), set `vaultKey` to the parent key (e.g. `"dob"`) so consuming apps know the source field
 - Never use a key that already exists in a published schema — renaming is a breaking change
@@ -108,8 +123,8 @@ Add your schema to the jurisdiction's `index.ts`:
 ```typescript
 // src/forms/minato/index.ts
 export { juminhyoSchema } from "./juminhyo.js";
-export { teninSchema }    from "./tenin.js";
-export { myFormSchema }   from "./my-form.js";  // ← add this
+export { teninSchema } from "./tenin.js";
+export { myFormSchema } from "./my-form.js"; // ← add this
 ```
 
 Then add it to `src/forms/index.ts`:
@@ -122,7 +137,7 @@ export * from "./minato/index.js";
 export const allForms = [
   juminhyoSchema,
   teninSchema,
-  myFormSchema,  // ← add this
+  myFormSchema, // ← add this
 ];
 ```
 
@@ -161,29 +176,29 @@ export { myFormSchema } from "./my-form.js";
 ### 3 — Wire into src/forms/index.ts
 
 ```typescript
-import { juminhyoSchema, teninSchema }  from "./minato/index.js";
-import { myFormSchema }                 from "./shinjuku-ku/index.js";  // ← add
+import { juminhyoSchema, teninSchema } from "./minato/index.js";
+import { myFormSchema } from "./shinjuku-ku/index.js"; // ← add
 
 export * from "./minato/index.js";
-export * from "./shinjuku-ku/index.js";  // ← add
+export * from "./shinjuku-ku/index.js"; // ← add
 
 export const allForms = [
   juminhyoSchema,
   teninSchema,
-  myFormSchema,  // ← add
+  myFormSchema, // ← add
 ];
 ```
 
 ### 4 — Jurisdiction slug conventions
 
-| Jurisdiction | Slug |
-| --- | --- |
-| 港区 Minato ward | `minato-ku` |
-| 新宿区 Shinjuku ward | `shinjuku-ku` |
-| 渋谷区 Shibuya ward | `shibuya-ku` |
-| National forms (pension, tax) | `national` |
-| Immigration Bureau | `immigration-bureau` |
-| Banks | `smbc`, `mizuho`, `mufg` etc. |
+| Jurisdiction                  | Slug                          |
+| ----------------------------- | ----------------------------- |
+| 港区 Minato ward              | `minato-ku`                   |
+| 新宿区 Shinjuku ward          | `shinjuku-ku`                 |
+| 渋谷区 Shibuya ward           | `shibuya-ku`                  |
+| National forms (pension, tax) | `national`                    |
+| Immigration Bureau            | `immigration-bureau`          |
+| Banks                         | `smbc`, `mizuho`, `mufg` etc. |
 
 Use kebab-case. For wards, use `{ward-name}-ku`. For national institutions, use a descriptive slug.
 
@@ -208,6 +223,7 @@ Before adding a new value, check if an existing category covers your form. Addin
 If you believe a new category is needed, open an issue first to discuss it before submitting a PR with the types change. This ensures we don't accumulate redundant categories.
 
 When adding a new category in a PR:
+
 - Update `FormCategory` in `src/types.ts`
 - Note the minor version bump in your PR description
 - The maintainer will update `package.json` version before merging
@@ -239,7 +255,7 @@ When a form has multiple language versions, use the `variants` field instead of 
 ```typescript
 export const juminhyoSchema: OverlayFormSchema = {
   id: "juminhyo",
-  pdfFilename: "juminhyo.pdf",      // default — Japanese version
+  pdfFilename: "juminhyo.pdf", // default — Japanese version
   downloadName: "juminhyo.pdf",
   sourceUrl: "https://www.city.minato.tokyo.jp/",
   // ...
@@ -248,7 +264,7 @@ export const juminhyoSchema: OverlayFormSchema = {
       lang: "en",
       pdfFilename: "juminhyo-en.pdf",
       downloadName: "juminhyo-en.pdf",
-      sourceUrl: "https://www.city.minato.tokyo.jp/",  // URL for the English PDF specifically
+      sourceUrl: "https://www.city.minato.tokyo.jp/", // URL for the English PDF specifically
     },
   ],
   fields: [

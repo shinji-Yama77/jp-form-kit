@@ -44,40 +44,45 @@ scripts/                contributor tooling — NOT part of the published packag
 // src/types.ts
 
 export type FormCategory =
-  | "ward" | "immigration" | "pension" | "employment" | "banking" | "housing";
+  | "ward"
+  | "immigration"
+  | "pension"
+  | "employment"
+  | "banking"
+  | "housing";
 
 export interface OverlayField {
-  key: string;           // unique within the form — used as lookup key in the values map
-  x: number;            // PDF x coordinate, bottom-left origin, in points
-  y: number;            // PDF y coordinate
-  size?: number;        // font size override (default 9pt used by the overlay engine)
-  vaultKey?: string;    // if this field is a sub-part (e.g. dob_year), the parent data key (e.g. "dob")
-  labelEn?: string;     // English label for review UIs
-  labelJa?: string;     // Japanese label for review UIs
+  key: string; // unique within the form — used as lookup key in the values map
+  x: number; // PDF x coordinate, bottom-left origin, in points
+  y: number; // PDF y coordinate
+  size?: number; // font size override (default 9pt used by the overlay engine)
+  vaultKey?: string; // if this field is a sub-part (e.g. dob_year), the parent data key (e.g. "dob")
+  labelEn?: string; // English label for review UIs
+  labelJa?: string; // Japanese label for review UIs
   required?: boolean;
 }
 
 export interface FormVariant {
-  lang: "ja" | "en";      // language of this PDF version
-  pdfFilename: string;    // filename for this language's PDF
-  downloadName: string;   // suggested export filename
-  sourceUrl: string;      // URL where this specific PDF version was obtained
+  lang: "ja" | "en"; // language of this PDF version
+  pdfFilename: string; // filename for this language's PDF
+  downloadName: string; // suggested export filename
+  sourceUrl: string; // URL where this specific PDF version was obtained
 }
 
 export interface OverlayFormSchema {
-  id: string;                   // kebab-case, unique across all schemas
-  titleJa: string;              // official Japanese form title
-  titleEn: string;              // English translation
-  pdfFilename: string;          // just the filename — consumer app controls the base path
-  downloadName: string;         // suggested filename for the exported PDF
-  sourceUrl: string;            // real government URL — must be verifiable
+  id: string; // kebab-case, unique across all schemas
+  titleJa: string; // official Japanese form title
+  titleEn: string; // English translation
+  pdfFilename: string; // just the filename — consumer app controls the base path
+  downloadName: string; // suggested filename for the exported PDF
+  sourceUrl: string; // real government URL — must be verifiable
   category: FormCategory;
-  jurisdiction: string;         // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"
-  lastVerifiedAt: string;       // ISO 8601 date (YYYY-MM-DD)
+  jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"
+  lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD)
   verificationLocation: string; // human-readable — e.g. "港区役所 official website — city.minato.tokyo.jp"
   warningThresholdDays: number; // days before consuming apps show a staleness warning
-  description: string;          // one-line English description
-  variants?: FormVariant[];     // additional language versions — fields and coordinates are shared
+  description: string; // one-line English description
+  variants?: FormVariant[]; // additional language versions — fields and coordinates are shared
   fields: OverlayField[];
 }
 // NOTE: `free: boolean` from the original SmartLayer app has been removed — app-specific pricing
@@ -146,7 +151,7 @@ Never fill in `x`/`y` values unless given real coordinates from the workflow out
 ## scripts/ — what each script does
 
 | Script | Purpose |
-|--------|---------|
+| ------ | ------- |
 
 | `extract-coords.mjs` | Reads a Preview-annotated PDF using `pdfjs-dist`. Prints all FreeText annotation rects. Run with `node scripts/extract-coords.mjs path/to/annotated.pdf` |
 | `coord-picker.html` | Open in browser. Load a PDF, click each field to record x/y. Export JSON. Alternative to the Preview annotation workflow. |
@@ -172,14 +177,14 @@ The `files` field in `package.json` controls what's published. Only `dist/` is i
 
 ## Version bumps
 
-| Change type | Version bump |
-| --- | --- |
-| New form schema added | patch (0.1.x) |
-| Existing schema coordinates fixed | patch |
-| `lastVerifiedAt` updated | patch |
+| Change type                                                       | Version bump  |
+| ----------------------------------------------------------------- | ------------- |
+| New form schema added                                             | patch (0.1.x) |
+| Existing schema coordinates fixed                                 | patch         |
+| `lastVerifiedAt` updated                                          | patch         |
 | New optional field added to `OverlayField` or `OverlayFormSchema` | minor (0.x.0) |
-| New `FormCategory` value added | minor |
-| Any field renamed or removed from types | major (x.0.0) |
-| Any existing schema field `key` renamed | major |
+| New `FormCategory` value added                                    | minor         |
+| Any field renamed or removed from types                           | major (x.0.0) |
+| Any existing schema field `key` renamed                           | major         |
 
 Always update `version` in `package.json` before publishing.

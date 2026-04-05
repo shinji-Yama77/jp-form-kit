@@ -36,7 +36,7 @@ export interface RenderOptions {
 export async function renderOverlayPdf(
   schema: OverlayFormSchema | string,
   values: Record<string, string>,
-  options: RenderOptions
+  options: RenderOptions,
 ): Promise<Uint8Array> {
   // Resolve schema id → schema object
   const resolvedSchema: OverlayFormSchema =
@@ -86,7 +86,7 @@ export async function renderOverlayPdfToFile(
   schema: OverlayFormSchema | string,
   values: Record<string, string>,
   options: RenderOptions,
-  outputPath: string
+  outputPath: string,
 ): Promise<void> {
   const bytes = await renderOverlayPdf(schema, values, options);
   writeFileSync(outputPath, bytes);
