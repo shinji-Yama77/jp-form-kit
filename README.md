@@ -1,21 +1,26 @@
 # jp-form-kit
 
-`jp-form-kit` is a TypeScript library of typed overlay schemas for Japanese government PDF forms.
+`jp-form-kit` is a TypeScript package for Japanese government PDF forms.
 
-It is designed for apps that need to prefill or review flat PDF forms by drawing text at known `x/y` coordinates. The package publishes form metadata, field definitions, and TypeScript types. It does not ship a PDF renderer or overlay engine.
+It ships:
+
+- typed form schemas
+- schema metadata and field coordinates
+- a Node-first PDF overlay engine
+
+The package is designed for apps and scripts that need to render values onto known blank Japanese government PDFs without rebuilding the schema and coordinate layer from scratch.
 
 ## What This Package Is
 
 - A typed catalog of Japanese form schemas
-- A source of `x/y` field coordinates for PDF overlay workflows
-- A small zero-runtime-dependency TypeScript package
+- A PDF overlay engine for Node
+- A reusable package for schema-driven Japanese form filling workflows
 
 ## What This Package Is Not
 
-- Not an SDK
-- Not a PDF rendering library
-- Not a browser UI
+- Not a browser-first package
 - Not a complete archive of Japanese forms
+- Not a bundled collection of official blank PDFs
 
 ## Installation
 
@@ -26,17 +31,65 @@ npm install jp-form-kit
 ## Quick Example
 
 ```ts
-import { allForms, type OverlayFormSchema } from "jp-form-kit";
+import { renderOverlayPdfToFile } from "jp-form-kit";
 
-const form: OverlayFormSchema | undefined = allForms.find(
-  (schema) => schema.id === "juminhyo",
+await renderOverlayPdfToFile(
+  "juminhyo",
+  {
+    name: "SMITH JOHN",
+    address: "東京都港区六本木3-1-1",
+    dob_year: "1990",
+    dob_month: "03",
+    dob_day: "15",
+  },
+  {
+    assetRoot: "./pdfs",
+    fontPath: "./fonts/NotoSansJP-Regular.ttf",
+  },
+  "./output/juminhyo-filled.pdf",
 );
+```
 
-if (form) {
-  console.log(form.titleEn);
-  console.log(form.pdfFilename);
-  console.log(form.fields.map((field) => field.key));
+## Asset Folder Convention
+
+The engine expects blank PDFs under a deterministic folder layout:
+
+```text
+{assetRoot}/{jurisdiction}/{schema.id}/{pdfFilename}
+```
+
+For example:
+
+```text
+pdfs/
+  minato-ku/
+    juminhyo/
+      juminhyo.pdf
+    tenin/
+      tenin.pdf
+```
+
+If you pass:
+
+```ts
+{
+  assetRoot: "./pdfs",
+  fontPath: "./fonts/NotoSansJP-Regular.ttf",
 }
+```
+
+then the engine will resolve `juminhyo` to:
+
+```text
+./pdfs/minato-ku/juminhyo/juminhyo.pdf
+```
+
+You can also inspect the expected path directly:
+
+```ts
+import { getPdfPath, juminhyoSchema } from "jp-form-kit";
+
+const path = getPdfPath(juminhyoSchema, "./pdfs");
 ```
 
 ## Exports
@@ -48,16 +101,37 @@ The package currently exposes:
 - `OverlayField`
 - `FormVariant`
 - `OverlayFormSchema`
-- Individual schema exports re-exported from `src/forms/`
+- individual schema exports
+- `renderOverlayPdf`
+- `renderOverlayPdfToFile`
+- `getPdfPath`
+- `MissingPdfError`
+- `MissingFontError`
+- `UnknownSchemaError`
+
+## Engine API
+
+### `renderOverlayPdf(schema, values, options)`
+
+Generates a filled PDF and returns the output bytes as `Uint8Array`.
+
+- `schema`: an `OverlayFormSchema` object or schema id string such as `"juminhyo"`
+- `values`: record of field key to drawn string value
+- `options.assetRoot`: top-level folder containing the blank PDF tree
+- `options.fontPath`: path to a Japanese-capable `.ttf` font
+
+### `renderOverlayPdfToFile(schema, values, options, outputPath)`
+
+Convenience wrapper that renders and writes the generated PDF to disk.
 
 ## Schema Shape
 
 Each form schema includes:
 
-- Stable form metadata such as `id`, `titleJa`, `titleEn`, `category`, and `jurisdiction`
-- Source provenance such as `sourceUrl`, `lastVerifiedAt`, and `verificationLocation`
-- PDF file hints such as `pdfFilename` and `downloadName`
-- A `fields` array containing overlay coordinates and field labels
+- stable form metadata such as `id`, `titleJa`, `titleEn`, `category`, and `jurisdiction`
+- provenance such as `sourceUrl`, `lastVerifiedAt`, and `verificationLocation`
+- file hints such as `pdfFilename` and `downloadName`
+- a `fields` array containing overlay coordinates and field labels
 
 Field coordinates use PDF points with a bottom-left origin, matching common PDF drawing APIs such as `pdf-lib`.
 
@@ -73,6 +147,11 @@ src/
       index.ts
       juminhyo.ts
       tenin.ts
+  engine/
+    index.ts
+    render.ts
+    resolve-pdf.ts
+    errors.ts
 
 dist/
   generated build output published to npm
@@ -87,8 +166,8 @@ This package is only useful if schemas are trustworthy.
 
 - `sourceUrl` should point to the official government source for the form
 - `lastVerifiedAt` should reflect a real verification date
-- Coordinates should come from a documented mapping workflow, not guesses
-- Updated PDFs may require coordinates to be remapped
+- coordinates should come from a documented mapping workflow, not guesses
+- updated PDFs may require coordinates to be remapped
 
 ## Contributing
 
@@ -98,8 +177,8 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the contribution workflow, coordi
 
 ## Publish Model
 
-The published npm package includes only `dist/`. Source files, local tooling, and contributor documentation stay in the repository but are not part of the runtime package.
+The published npm package includes code in `dist/`. Blank source PDFs are not bundled into the package for v1; consumers are expected to keep them in a local asset directory that follows the documented convention.
 
 ## Status
 
-This project is intentionally starting small. Early releases focus on a small number of high-value forms with verified metadata and clear type definitions rather than broad coverage.
+This project is intentionally starting small. Early releases focus on a small number of high-value forms with verified metadata and a working Node overlay flow rather than broad coverage.
