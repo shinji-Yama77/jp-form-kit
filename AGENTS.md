@@ -1,0 +1,185 @@
+# AGENTS.md — Instructions for AI agents working in this repo
+
+This file tells Claude Code (and other AI coding agents) how this repo works, what's in it, and how to contribute correctly.
+
+---
+
+## What this repo is
+
+`jp-form-schemas` is a TypeScript npm package. It contains:
+
+1. **TypeScript types** — `OverlayFormSchema`, `OverlayField`, `FormCategory` in `src/types.ts`
+2. **Form schemas** — plain TypeScript objects describing the fields of Japanese government forms, organized by ward/institution under `src/forms/`
+3. **Contributor scripts** — Node.js + browser tools in `scripts/` for authoring new schemas (not published to npm)
+
+The published package (`dist/`) has **zero runtime dependencies**. It is pure compiled TypeScript — types and data objects only.
+
+---
+
+## Repo structure
+
+```text
+src/
+  types.ts              canonical type definitions — edit carefully, breaking changes = major version bump
+  forms/
+    minato/             forms from 港区役所 and related Minato ward institutions
+      juminhyo.ts       住民票等請求書
+      tenin.ts          転入届
+      index.ts          re-exports all minato schemas
+    index.ts            re-exports all forms + exports allForms array
+  index.ts              public package entry — only this file and what it re-exports is public API
+
+scripts/                contributor tooling — NOT part of the published package
+  extract-coords.mjs    reads a Preview-annotated PDF → prints annotation rects
+  coord-picker.html     browser canvas tool — click PDF to record x/y coordinates
+  inspect-pdf.mjs       checks if a PDF has AcroForm fields or is flat
+  test-overlay.mjs      draws bounding boxes on a PDF to verify schema coordinates
+```
+
+---
+
+## Core types — read these before touching anything
+
+```typescript
+// src/types.ts
+
+export type FormCategory =
+  | "ward" | "immigration" | "pension" | "employment" | "banking" | "housing";
+
+export interface OverlayField {
+  key: string;           // unique within the form — used as lookup key in the values map
+  x: number;            // PDF x coordinate, bottom-left origin, in points
+  y: number;            // PDF y coordinate
+  size?: number;        // font size override (default 9pt used by the overlay engine)
+  vaultKey?: string;    // if this field is a sub-part (e.g. dob_year), the parent data key (e.g. "dob")
+  labelEn?: string;     // English label for review UIs
+  labelJa?: string;     // Japanese label for review UIs
+  required?: boolean;
+}
+
+export interface FormVariant {
+  lang: "ja" | "en";      // language of this PDF version
+  pdfFilename: string;    // filename for this language's PDF
+  downloadName: string;   // suggested export filename
+  sourceUrl: string;      // URL where this specific PDF version was obtained
+}
+
+export interface OverlayFormSchema {
+  id: string;                   // kebab-case, unique across all schemas
+  titleJa: string;              // official Japanese form title
+  titleEn: string;              // English translation
+  pdfFilename: string;          // just the filename — consumer app controls the base path
+  downloadName: string;         // suggested filename for the exported PDF
+  sourceUrl: string;            // real government URL — must be verifiable
+  category: FormCategory;
+  jurisdiction: string;         // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"
+  lastVerifiedAt: string;       // ISO 8601 date (YYYY-MM-DD)
+  verificationLocation: string; // human-readable — e.g. "港区役所 official website — city.minato.tokyo.jp"
+  warningThresholdDays: number; // days before consuming apps show a staleness warning
+  description: string;          // one-line English description
+  variants?: FormVariant[];     // additional language versions — fields and coordinates are shared
+  fields: OverlayField[];
+}
+// NOTE: `free: boolean` from the original SmartLayer app has been removed — app-specific pricing
+// NOTE: `pdfUrl` renamed to `pdfFilename` — apps control their own asset paths
+```
+
+---
+
+## How coordinates work
+
+Japanese government PDFs are almost always **flat** (no AcroForm fields). Coordinates are placed by:
+
+1. Opening the PDF in **macOS Preview**
+2. Adding text annotations (Tools → Annotate → Text) with the field key name typed inside
+3. Running `node scripts/extract-coords.mjs path/to/annotated.pdf`
+4. Script outputs `rect: [x1, y1, x2, y2]` for each annotation
+5. Schema uses `x = x1`, `y = y1` (bottom-left of the annotation box) — or midpoint if that aligns better
+6. Verify with `node scripts/test-overlay.mjs` — this draws red boxes to show where text will be drawn
+
+**Coordinate system**: PDF points, origin at bottom-left of the page. x increases right, y increases up. This matches `pdf-lib`'s drawing API.
+
+---
+
+## Rules for agents
+
+### What you CAN do freely
+
+- Add new form schema files under `src/forms/`
+- Update `lastVerifiedAt` on existing schemas when re-verifying
+- Fix coordinates on existing schemas (patch version change)
+- Add new exports to `index.ts` files
+- Update `scripts/` tooling
+- Fix typos in `labelEn`, `labelJa`, `description`, `titleEn`
+
+### What requires care
+
+- **`src/types.ts`** — adding optional fields to interfaces is fine (minor version). Renaming or removing fields is a breaking change (major version). Never change types without updating the version in `package.json`.
+- **Existing field `key` values** — never rename a `key` in an already-published schema. Consumer apps reference keys by name. Renaming is a breaking change.
+- **`sourceUrl`** — must always be a real, working URL to the official government source. Never invent or guess URLs.
+- **`lastVerifiedAt`** — only set this to a date when the schema has actually been checked against the live form. Do not set it to today's date speculatively.
+
+### What you must NOT do
+
+- Do not add runtime dependencies to the package (no imports in `src/` from npm packages)
+- Do not commit PDF files to the repo
+- Do not generate or guess `x/y` coordinates — they must come from the annotation/coord-picker workflow
+- Do not modify `dist/` manually — it is generated by `npm run build`
+- Do not create schemas for forms that have not been verified against a real PDF
+
+---
+
+## Adding a new form schema
+
+When asked to scaffold a new form, do this:
+
+1. Create `src/forms/{ward}/{form-id}.ts` with the `OverlayFormSchema` structure
+2. Leave `fields: []` and add a comment `// TODO: coordinates need to be mapped via extract-coords.mjs workflow`
+3. Set `lastVerifiedAt` to an empty string `""` until verification is done
+4. Export it from `src/forms/{ward}/index.ts` and `src/forms/index.ts`
+5. Add it to the `allForms` array in `src/forms/index.ts`
+
+Never fill in `x`/`y` values unless given real coordinates from the workflow output. Guessed coordinates will silently produce misaligned overlays.
+
+---
+
+## scripts/ — what each script does
+
+| Script | Purpose |
+|--------|---------|
+
+| `extract-coords.mjs` | Reads a Preview-annotated PDF using `pdfjs-dist`. Prints all FreeText annotation rects. Run with `node scripts/extract-coords.mjs path/to/annotated.pdf` |
+| `coord-picker.html` | Open in browser. Load a PDF, click each field to record x/y. Export JSON. Alternative to the Preview annotation workflow. |
+| `inspect-pdf.mjs` | Run first on any new PDF. Tells you if it has AcroForm fields (interactive) or is flat. Run with `node scripts/inspect-pdf.mjs path/to/form.pdf` |
+| `test-overlay.mjs` | Takes a source PDF + schema, draws red bounding boxes at each field coordinate. Use to verify alignment before submitting a PR. |
+
+These scripts use `pdf-lib`, `pdfjs-dist`, and `fontkit` which are in `devDependencies`. They are never published.
+
+---
+
+## Build and publish
+
+```bash
+npm run build     # compiles src/ → dist/ using tsconfig.build.json
+npm run typecheck # runs tsc --noEmit to check types without building
+npm pack          # preview what gets published — should only contain dist/ + README + LICENSE
+npm publish --access public
+```
+
+The `files` field in `package.json` controls what's published. Only `dist/` is included. Everything else (src, scripts, docs) is excluded.
+
+---
+
+## Version bumps
+
+| Change type | Version bump |
+| --- | --- |
+| New form schema added | patch (0.1.x) |
+| Existing schema coordinates fixed | patch |
+| `lastVerifiedAt` updated | patch |
+| New optional field added to `OverlayField` or `OverlayFormSchema` | minor (0.x.0) |
+| New `FormCategory` value added | minor |
+| Any field renamed or removed from types | major (x.0.0) |
+| Any existing schema field `key` renamed | major |
+
+Always update `version` in `package.json` before publishing.

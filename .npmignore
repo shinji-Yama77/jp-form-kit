@@ -1,0 +1,10 @@
+scripts/
+src/
+*.ts
+!dist/
+tsconfig*.json
+PLAN.md
+CONTRIBUTING.md
+AGENTS.md
+CLAUDE.md
+.gitignore
