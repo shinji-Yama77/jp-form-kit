@@ -235,9 +235,19 @@ An optional output path can be specified:
 node scripts/test-overlay.mjs annotated.pdf blank.pdf output/verify-juminhyo.pdf
 ```
 
-**Step 5 — Write the schema**
+**Step 5 — Generate the schema**
 
-Use `x = rect[0]`, `y = rect[1]` from the `extract-annotations.mjs` output as your schema field coordinates.
+```
+node scripts/generate-schema.mjs formid_annotated.pdf \
+  --id formid \
+  --jurisdiction ward-slug \
+  --pdf blank-form.pdf \
+  --out src/forms/ward/formid.ts
+```
+
+This writes a TypeScript schema file with all field coordinates pre-filled from the annotations. Fill in the `// TODO` fields (`titleJa`, `titleEn`, `sourceUrl`, `description`, etc.) and you're done.
+
+If `--out` is omitted the schema is printed to stdout so you can preview it first.
 
 **Step 6 — Attach the verification PDF to your PR**
 
@@ -255,7 +265,103 @@ Replace any remaining references to `extract-coords.mjs` with `extract-annotatio
 
 ---
 
-## 5. Delete `scripts/extract-coords.mjs`
+## 5. `scripts/generate-schema.mjs` (new)
+
+**Action:** Create  
+**Path:** `scripts/generate-schema.mjs`
+
+Reads the annotated PDF and generates a ready-to-edit TypeScript schema file. Contributors run this after step 3 of the annotation workflow instead of writing the schema by hand. The output is a `.ts` file they can drop straight into `src/forms/{jurisdiction}/`.
+
+### Interface
+
+```
+node scripts/generate-schema.mjs <annotated-pdf-path> \
+  --id <form-id> \
+  --jurisdiction <jurisdiction-slug> \
+  --pdf <blank-pdf-filename> \
+  [--out <output-path>]
+```
+
+Example:
+```
+node scripts/generate-schema.mjs forms/juminhyo_annotated.pdf \
+  --id juminhyo \
+  --jurisdiction minato-ku \
+  --pdf juminhyo.pdf \
+  --out src/forms/minato/juminhyo.ts
+```
+
+All four flags are required except `--out`. Without `--out`, the generated TypeScript is printed to stdout.
+
+### What it generates
+
+Given the above command and three annotations (`name`, `address`, `phone`), the output is:
+
+```ts
+import type { OverlayFormSchema } from "../../types.js";
+
+export const juminhyoSchema: OverlayFormSchema = {
+  id: "juminhyo",
+  titleJa: "", // TODO: fill in official Japanese form title
+  titleEn: "", // TODO: fill in English translation
+  pdfFilename: "juminhyo.pdf",
+  downloadName: "juminhyo.pdf",
+  sourceUrl: "", // TODO: official government URL
+  category: "ward", // TODO: ward | immigration | pension | employment | banking | housing
+  jurisdiction: "minato-ku",
+  lastVerifiedAt: "", // TODO: set to YYYY-MM-DD after verifying against the live form
+  verificationLocation: "", // TODO: e.g. "港区役所 official website — city.minato.tokyo.jp"
+  warningThresholdDays: 180,
+  description: "", // TODO: one-line English description
+  fields: [
+    { key: "name",    x: 83,  y: 708 },
+    { key: "address", x: 91,  y: 672 },
+    { key: "phone",   x: 419, y: 639 },
+  ],
+};
+```
+
+### Generation rules
+
+**Import path depth** — inferred from `--out` path. Count how many directories deep the output file is under `src/` and generate the right relative import:
+- `src/forms/minato/foo.ts` → `../../types.js` (2 levels up)
+- `src/forms/foo.ts` → `../types.js` (1 level up)
+- If `--out` not provided or depth can't be determined → use `"../../types.js"` with a comment `// adjust import path if needed`
+
+**Export name** — camelCase the `--id` value + `Schema` suffix: `juminhyo` → `juminhyoSchema`, `kenko-hoken` → `kenkoHokenSchema`
+
+**`category` default** — default to `"ward"` with a `// TODO` comment listing all valid values
+
+**`vaultKey` inference** — if a field key ends in `_year`, `_month`, or `_day`, infer the parent vault key and add it:
+- `dob_year` → `vaultKey: "dob"`
+- `dob_month` → `vaultKey: "dob"`
+- `move_year` → `vaultKey: "move_date"`
+- `application_year`, `submit_year` → no vaultKey (these are auto-populated from current date, not from vault)
+
+**`labelEn` / `labelJa`** — populated from the `FIELD_NAMES.md` canonical key table for known keys. Unknown keys get no labels.
+
+**`required`** — set `required: true` for `name`, `address`, `dob_year`, `dob_month`, `dob_day` by default (these are required on most forms). All other fields omit `required`.
+
+**Field alignment** — align the `x:` and `y:` values in columns for readability (same style as existing schemas).
+
+**Unknown keys** — included as-is with a trailing comment:
+```ts
+{ key: "some_unknown_key", x: 100, y: 200 }, // ⚠ unknown key — check FIELD_NAMES.md
+```
+
+### `--out` behaviour
+
+- If `--out` path doesn't exist, write the file
+- If `--out` path already exists, print an error and exit 1 — never overwrite an existing schema
+- Create intermediate directories if needed
+
+### Dependencies
+
+`pdfjs-dist` (already in devDependencies), `fs`, `path`, `url` — Node built-ins only.
+
+---
+
+## 6. Delete `scripts/extract-coords.mjs`
 
 **Action:** Delete after `extract-annotations.mjs` is confirmed working.
 
@@ -369,6 +475,9 @@ These are out of scope for this milestone but should be noted in a future issue.
 | `FIELD_NAMES.md` | Create |
 | `scripts/extract-annotations.mjs` | Create |
 | `scripts/test-overlay.mjs` | Full rewrite |
+| `scripts/extract-annotations.mjs` | Create |
+| `scripts/generate-schema.mjs` | Create |
+| `scripts/test-overlay.mjs` | Full rewrite |
 | `scripts/test-render.mjs` | Create |
 | `CONTRIBUTING.md` | Insert "Annotation workflow" section + update script refs + debug-vs-production note |
 | `scripts/extract-coords.mjs` | Delete |
@@ -387,4 +496,6 @@ After implementation, confirm:
 4. `node scripts/test-render.mjs` — writes `scripts/test-render-output.pdf`; open and confirm it looks like a real filled form with no debug marks
 5. Run `test-overlay.mjs` with a missing font path — confirm error message names `FONT_PATH` env var
 6. Run `extract-annotations.mjs` with no args — confirm usage message and exit 1
-7. `npm run typecheck` — still passes (scripts are not TypeScript)
+7. `node scripts/generate-schema.mjs public/forms/juminhyo_en.pdf --id juminhyo --jurisdiction minato-ku --pdf juminhyo.pdf` — prints valid TypeScript to stdout with 3 fields, correct `vaultKey` inferences, and `// TODO` placeholders
+8. Re-run with `--out` to a new path — confirm file is written; re-run again and confirm exit 1 (no overwrite)
+9. `npm run typecheck` — still passes (scripts are not TypeScript)
