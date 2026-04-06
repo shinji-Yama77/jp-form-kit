@@ -216,3 +216,92 @@ Renaming a published field key is still a breaking change.
 - PDFs are not bundled into npm for v1
 - PDF redistribution is deferred
 - v1 should stop at 2-3 excellent forms rather than stretching to broad coverage
+
+---
+
+## Next Milestone: Open Source Contributor Workflow
+
+The annotation-based workflow is the primary way contributors add new forms. This milestone standardises it so the repo is ready for external contributors.
+
+### What needs to be built
+
+#### 1. `FIELD_NAMES.md` (new)
+Single source of truth for canonical annotation label names. Contributors type EXACT keys from this table inside Preview text boxes when annotating a PDF.
+
+Content:
+- Naming conventions: `lowercase_snake_case`, `_year/_month/_day` suffix for date splits, `_2` suffix for duplicate sections
+- Table of 23 canonical keys with: key name, English description, Japanese label, example value, notes
+
+Canonical key set (derived from juminhyo + tenin schemas):
+```
+name, furigana, address, phone
+dob_year, dob_month, dob_day
+application_year, application_month, application_day
+submit_year, submit_month, submit_day
+move_year, move_month, move_day
+name_2, furigana_2, address_2, phone_2
+dob_year_2, dob_month_2, dob_day_2
+```
+
+#### 2. `scripts/extract-annotations.mjs` (new — replaces `extract-coords.mjs`)
+Generic CLI that reads FreeText annotations from any annotated PDF.
+
+```
+node scripts/extract-annotations.mjs <annotated-pdf-path> [--json]
+```
+
+- Filters by `subtype === "FreeText"`
+- Extracts label via `ann.textContent?.join("").trim() ?? ann.contentsObj?.str?.trim()`
+- Rounds rect values
+- Outputs per annotation: `{ label, x, y, width, height, rect }` where `x=rect[0]`, `y=rect[1]`
+- Validates label against embedded `CANONICAL_KEYS` Set — prints `⚠ UNKNOWN KEY` warning, does not exit non-zero
+- `--json` flag: pure JSON array to stdout, warnings suppressed
+
+Dependencies: `pdfjs-dist` (already in devDependencies), Node built-ins only.
+
+#### 3. `scripts/test-overlay.mjs` (rewrite)
+Replaces the hardcoded version. Reads annotations live from the annotated PDF, overlays sample data on the blank PDF.
+
+```
+node scripts/test-overlay.mjs <annotated-pdf-path> <blank-pdf-path> [output-path]
+```
+
+- Default output: `scripts/test-overlay-output.pdf`
+- Font resolved via `FONT_PATH` env var, fallback `../public/fonts/NotoSansJP-Regular.ttf` relative to scripts dir
+- Uses `fileURLToPath(import.meta.url)` for `__dirname` in ESM
+- Per annotation: red border rect, sample value vertically centred (`y1 + (boxH - 9) / 2`), key label above box in blue at 5pt
+- Unknown key: uses label string as value (visible, not silent)
+- Sample data covers all 23 canonical keys with realistic Japanese values
+
+Dependencies: `pdf-lib`, `@pdf-lib/fontkit`, `pdfjs-dist`, Node built-ins. No new packages needed.
+
+#### 4. `CONTRIBUTING.md` — add "Annotation workflow" section
+Replace `extract-coords.mjs` references with the two-step workflow. The six-step flow:
+
+```
+Step 1 — cp blank-form.pdf formid_annotated.pdf
+Step 2 — Open in Preview → Tools → Annotate → Text
+          Draw text box over each field, type the exact canonical key name
+          See FIELD_NAMES.md for the full key list
+Step 3 — node scripts/extract-annotations.mjs formid_annotated.pdf
+          Verify no ⚠ UNKNOWN KEY warnings
+Step 4 — node scripts/test-overlay.mjs formid_annotated.pdf blank-form.pdf
+          Open output PDF, verify red boxes align with the correct fields
+Step 5 — Write TypeScript schema using x=rect[0], y=rect[1] from extract output
+Step 6 — Attach test-overlay output PDF to PR (required — reviewers cannot verify numbers alone)
+```
+
+Update PR checklist to require both scripts.
+
+#### 5. Delete `scripts/extract-coords.mjs`
+After `extract-annotations.mjs` is confirmed working. Not published to npm so no API concern.
+
+### Files changed
+
+| File | Action |
+|------|--------|
+| `FIELD_NAMES.md` | Create |
+| `scripts/extract-annotations.mjs` | Create |
+| `scripts/test-overlay.mjs` | Rewrite |
+| `CONTRIBUTING.md` | Insert section + update script references |
+| `scripts/extract-coords.mjs` | Delete |
