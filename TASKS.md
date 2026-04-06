@@ -79,12 +79,17 @@ Implementation tasks derived from [SPEC.md](./SPEC.md). Work through these in or
 
 Run each of these and confirm it passes before marking done:
 
-- [ ] `node scripts/extract-annotations.mjs public/forms/juminhyo_en.pdf` — 3 annotations printed, all show `⚠ UNKNOWN KEY`
-- [ ] `node scripts/extract-annotations.mjs --json public/forms/juminhyo_en.pdf` — valid JSON array, no warnings in stdout
-- [ ] `node scripts/test-overlay.mjs public/forms/juminhyo_en.pdf public/forms/juminhyo.pdf` — output PDF written; open and verify red boxes + sample text
+- [ ] `node scripts/extract-annotations.mjs /path/to/juminhyo-annotated.pdf` — annotations printed from a local contributor PDF; unknown keys show `⚠ UNKNOWN KEY`
+- [ ] `node scripts/extract-annotations.mjs --json /path/to/juminhyo-annotated.pdf` — valid JSON array, no warnings in stdout
+- [ ] `node scripts/test-overlay.mjs /path/to/juminhyo-annotated.pdf /path/to/juminhyo.pdf` — output PDF written; open and verify red boxes + sample text
 - [ ] `node scripts/test-render.mjs` — output PDF written; open and confirm clean filled form, no debug marks
 - [ ] Run `test-overlay.mjs` with bad font path — error names `FONT_PATH` env var
 - [ ] Run `extract-annotations.mjs` with no args — usage message printed, exit 1
-- [ ] `node scripts/generate-schema.mjs public/forms/juminhyo_en.pdf --id juminhyo --jurisdiction minato-ku --pdf juminhyo.pdf` — valid TypeScript printed to stdout with correct `vaultKey` inferences and `// TODO` placeholders
+- [ ] `node scripts/generate-schema.mjs /path/to/juminhyo-annotated.pdf --id juminhyo --jurisdiction minato-ku --pdf juminhyo.pdf` — valid TypeScript printed to stdout with correct `vaultKey` inferences and `// TODO` placeholders
 - [ ] Re-run above with `--out path/new-schema.ts` — file written; re-run again and confirm exit 1 (no overwrite)
 - [ ] `npm run typecheck` — passes
+
+Notes:
+
+- Verification commands should use contributor-local PDFs, not repo-committed blank forms.
+- For engine tests and manual render checks, blank PDFs should follow the documented asset convention under the chosen `ASSET_ROOT`.
