@@ -1,47 +1,105 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
-import { readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import { readFreeTextAnnotations } from "./lib/read-annotations.mjs";
 
-// Annotations extracted from the filled Preview PDF
-// rect: [x1, y1, x2, y2]
-const annotations = [
-  { rect: [87, 731, 372, 747], label: "field_1" },
-  { rect: [83, 708, 374, 724], label: "field_2" },
-  { rect: [91, 672, 571, 688], label: "field_3" },
-  { rect: [420, 632, 572, 663], label: "field_4" },
-];
+const DEFAULT_OUTPUT_PATH = "scripts/test-overlay-output.pdf";
+const FONT_PATH = process.env.FONT_PATH;
+const DEFAULT_FONT_SIZE = 9;
 
-const pdfBytes = readFileSync("public/forms/juminhyo.pdf");
-const doc = await PDFDocument.load(pdfBytes);
-doc.registerFontkit(fontkit);
+const SAMPLE_DATA = {
+  Name: "田中 太郎",
+  furigana: "タナカ タロウ",
+  Address: "東京都港区六本木1-1-1",
+  Phone: "090-1234-5678",
+  dob_year: "1990",
+  dob_month: "05",
+  dob_day: "15",
+  application_year: "2026",
+  application_month: "04",
+  application_day: "07",
+  submit_year: "2026",
+  submit_month: "04",
+  submit_day: "07",
+  move_year: "2026",
+  move_month: "04",
+  move_day: "01",
+  name_2: "田中 花子",
+  furigana_2: "タナカ ハナコ",
+  address_2: "東京都港区六本木1-1-1",
+  phone_2: "03-1234-5678",
+  dob_year_2: "1992",
+  dob_month_2: "07",
+  dob_day_2: "21",
+};
 
-const fontBytes = readFileSync("public/fonts/NotoSansJP-Regular.ttf");
-const font = await doc.embedFont(fontBytes);
-const page = doc.getPages()[0];
+function usage() {
+  console.error(
+    "Usage: node scripts/test-overlay.mjs <annotated-pdf> <blank-pdf> [output-path]\n" +
+      "Set FONT_PATH to a Japanese-capable .ttf font file, for example:\n" +
+      "FONT_PATH=./fonts/NotoSansJP-Regular.ttf"
+  );
+}
 
-for (const ann of annotations) {
-  const [x1, y1, x2, y2] = ann.rect;
+const [annotatedPdfPath, blankPdfPath, outputPath = DEFAULT_OUTPUT_PATH] = process.argv.slice(2);
 
-  // Draw red bounding box so we can see where each annotation sits
+if (!annotatedPdfPath || !blankPdfPath) {
+  usage();
+  process.exit(1);
+}
+
+if (!FONT_PATH) {
+  console.error(
+    "Missing FONT_PATH environment variable.\n" +
+      "Set FONT_PATH to a Japanese-capable .ttf font file before running this script."
+  );
+  process.exit(1);
+}
+
+if (!existsSync(FONT_PATH)) {
+  console.error(
+    `FONT_PATH does not exist: "${FONT_PATH}"\n` +
+      "Set FONT_PATH to a valid Japanese-capable .ttf font file."
+  );
+  process.exit(1);
+}
+
+const freeTextAnnotations = await readFreeTextAnnotations(annotatedPdfPath);
+
+const blankPdf = await PDFDocument.load(readFileSync(blankPdfPath));
+blankPdf.registerFontkit(fontkit);
+const font = await blankPdf.embedFont(readFileSync(FONT_PATH));
+const page = blankPdf.getPages()[0];
+
+for (const annotation of freeTextAnnotations) {
   page.drawRectangle({
-    x: x1,
-    y: y1,
-    width: x2 - x1,
-    height: y2 - y1,
+    x: annotation.x,
+    y: annotation.y,
+    width: annotation.width,
+    height: annotation.height,
     borderColor: rgb(1, 0, 0),
     borderWidth: 0.5,
   });
 
-  // Draw the label inside the box
-  page.drawText(ann.label, {
-    x: x1 + 2,
-    y: y1 + 2,
-    size: 9,
+  page.drawText(annotation.label, {
+    x: annotation.x,
+    y: annotation.y + annotation.height + 2,
+    size: 5,
+    font,
+    color: rgb(1, 0, 0),
+  });
+
+  const value = SAMPLE_DATA[annotation.label] ?? "";
+  if (!value) continue;
+
+  page.drawText(value, {
+    x: annotation.x + 2,
+    y: annotation.y + Math.max((annotation.height - DEFAULT_FONT_SIZE) / 2, 1),
+    size: DEFAULT_FONT_SIZE,
     font,
     color: rgb(0, 0, 1),
   });
 }
 
-const outBytes = await doc.save();
-writeFileSync("scripts/test-overlay-output.pdf", outBytes);
-console.log("Written to scripts/test-overlay-output.pdf — open it to see where the boxes land");
+writeFileSync(outputPath, await blankPdf.save());
+console.log(`Wrote debug overlay PDF to ${outputPath}`);
