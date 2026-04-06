@@ -1,30 +1,7 @@
 import { readFreeTextAnnotations } from "./lib/read-annotations.mjs";
+import canonicalKeys from "./config/canonical-keys.json" with { type: "json" };
 
-const CANONICAL_KEYS = new Set([
-  "name",
-  "furigana",
-  "address",
-  "phone",
-  "dob_year",
-  "dob_month",
-  "dob_day",
-  "application_year",
-  "application_month",
-  "application_day",
-  "submit_year",
-  "submit_month",
-  "submit_day",
-  "move_year",
-  "move_month",
-  "move_day",
-  "name_2",
-  "furigana_2",
-  "address_2",
-  "phone_2",
-  "dob_year_2",
-  "dob_month_2",
-  "dob_day_2",
-]);
+const CANONICAL_KEYS = new Set(canonicalKeys);
 
 function usage() {
   console.error(
