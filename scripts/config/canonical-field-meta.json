@@ -1,0 +1,8 @@
+{
+  "name": { "labelEn": "Full Name", "labelJa": "氏名" },
+  "furigana": { "labelEn": "Name (Katakana)", "labelJa": "フリガナ" },
+  "address": { "labelEn": "Address", "labelJa": "住所" },
+  "phone": { "labelEn": "Phone", "labelJa": "電話番号" },
+  "dob_year": { "labelEn": "Date of Birth", "labelJa": "生年月日" },
+  "move_year": { "labelEn": "Move-in Date", "labelJa": "転入日" }
+}
