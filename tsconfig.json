@@ -3,6 +3,9 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "paths": {
+      "pdf-lib/src/*": ["./node_modules/pdf-lib/cjs/*"]
+    },
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
