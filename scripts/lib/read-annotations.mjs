@@ -1,4 +1,4 @@
-import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.d.mts";
 import { readFileSync } from "fs";
 import { isAbsolute, join } from "path";
 

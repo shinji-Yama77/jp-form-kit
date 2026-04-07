@@ -1,8 +1,14 @@
 import { PDFDocument } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { readFileSync, existsSync, writeFileSync } from "fs";
-import { join } from "path";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import type { OverlayFormSchema } from "../types.js";
+
+const BUNDLED_FONT_PATH = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "../assets/NotoSansJP-Regular.ttf",
+);
 import { allForms } from "../forms/index.js";
 import { resolvePdfBytes } from "./resolve-pdf.js";
 import { MissingFontError, MissingPdfError, UnknownSchemaError } from "./errors.js";
@@ -21,8 +27,11 @@ export interface RenderOptions {
    * Ignored if pdfPath is provided.
    */
   assetRoot?: string;
-  /** Path to a Japanese-capable .ttf font file (e.g. NotoSansJP-Regular.ttf). Required. */
-  fontPath: string;
+  /**
+   * Path to a Japanese-capable .ttf font file (e.g. NotoSansJP-Regular.ttf).
+   * If omitted, the bundled NotoSansJP-Regular font is used.
+   */
+  fontPath?: string;
 }
 
 /**
@@ -38,7 +47,7 @@ export interface RenderOptions {
  *   name: "SMITH JOHN",
  *   address: "東京都港区六本木3-1-1",
  *   dob_year: "1990", dob_month: "03", dob_day: "15",
- * }, { assetRoot: "./forms", fontPath: "./fonts/NotoSansJP-Regular.ttf" });
+ * }, { pdfPath: "./forms/juminhyo.pdf" });
  *
  * writeFileSync("output.pdf", pdfBytes);
  */
@@ -71,8 +80,8 @@ export async function renderOverlayPdf(
   }
   const pdf = await PDFDocument.load(pdfBytes);
 
-  // Load Japanese font
-  const fontFullPath = join(options.fontPath);
+  // Load Japanese font — use bundled NotoSansJP if no fontPath provided
+  const fontFullPath = options.fontPath ?? BUNDLED_FONT_PATH;
   if (!existsSync(fontFullPath)) {
     throw new MissingFontError(fontFullPath);
   }
