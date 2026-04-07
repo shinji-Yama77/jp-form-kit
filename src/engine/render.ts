@@ -5,13 +5,15 @@ import { join } from "path";
 import type { OverlayFormSchema } from "../types.js";
 import { allForms } from "../forms/index.js";
 import { resolvePdfBytes } from "./resolve-pdf.js";
-import { MissingFontError, UnknownSchemaError } from "./errors.js";
+import { MissingFontError, MissingPdfError, UnknownSchemaError } from "./errors.js";
 
 const DEFAULT_FONT_SIZE = 9;
 
 export interface RenderOptions {
-  /** Directory where blank source PDFs live. Required. */
-  assetRoot: string;
+  /** Exact path to the blank source PDF. Takes priority over assetRoot if provided. */
+  pdfPath?: string;
+  /** Directory where blank source PDFs live, following the {assetRoot}/{jurisdiction}/{id}/{filename} convention. */
+  assetRoot?: string;
   /** Path to a Japanese-capable .ttf font file (e.g. NotoSansJP-Regular.ttf). Required. */
   fontPath: string;
 }
@@ -49,7 +51,17 @@ export async function renderOverlayPdf(
       : schema;
 
   // Resolve and load blank source PDF
-  const pdfBytes = resolvePdfBytes(resolvedSchema, options.assetRoot);
+  let pdfBytes: Uint8Array;
+  if (options.pdfPath) {
+    if (!existsSync(options.pdfPath)) {
+      throw new MissingPdfError(resolvedSchema.pdfFilename, options.pdfPath);
+    }
+    pdfBytes = new Uint8Array(readFileSync(options.pdfPath));
+  } else if (options.assetRoot) {
+    pdfBytes = resolvePdfBytes(resolvedSchema, options.assetRoot);
+  } else {
+    throw new MissingPdfError(resolvedSchema.pdfFilename, "(no pdfPath or assetRoot provided)");
+  }
   const pdf = await PDFDocument.load(pdfBytes);
 
   // Load Japanese font
