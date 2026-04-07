@@ -11,7 +11,7 @@ function usage() {
   console.error(
     "Usage: node scripts/test-overlay.mjs <annotated-pdf> <blank-pdf> [output-path]\n" +
       "Set FONT_PATH to a Japanese-capable .ttf font file, for example:\n" +
-      "FONT_PATH=./fonts/NotoSansJP-Regular.ttf"
+      "FONT_PATH=./fonts/NotoSansJP-Regular.ttf",
   );
 }
 
@@ -37,7 +37,8 @@ function buildSampleValue(label) {
   return `[${label}]`;
 }
 
-const [annotatedPdfPath, blankPdfPath, outputPath = DEFAULT_OUTPUT_PATH] = process.argv.slice(2);
+const [annotatedPdfPath, blankPdfPath, outputPath = DEFAULT_OUTPUT_PATH] =
+  process.argv.slice(2);
 
 if (!annotatedPdfPath || !blankPdfPath) {
   usage();
@@ -47,7 +48,7 @@ if (!annotatedPdfPath || !blankPdfPath) {
 if (!FONT_PATH) {
   console.error(
     "Missing FONT_PATH environment variable.\n" +
-      "Set FONT_PATH to a Japanese-capable .ttf font file before running this script."
+      "Set FONT_PATH to a Japanese-capable .ttf font file before running this script.",
   );
   process.exit(1);
 }
@@ -55,7 +56,7 @@ if (!FONT_PATH) {
 if (!existsSync(FONT_PATH)) {
   console.error(
     `FONT_PATH does not exist: "${FONT_PATH}"\n` +
-      "Set FONT_PATH to a valid Japanese-capable .ttf font file."
+      "Set FONT_PATH to a valid Japanese-capable .ttf font file.",
   );
   process.exit(1);
 }

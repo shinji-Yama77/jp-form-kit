@@ -5,7 +5,7 @@ const CANONICAL_KEYS = new Set(canonicalKeys);
 
 function usage() {
   console.error(
-    "Usage: node scripts/extract-annotations.mjs <annotated-pdf-path-or-filename> [--json]"
+    "Usage: node scripts/extract-annotations.mjs <annotated-pdf-path-or-filename> [--json]",
   );
 }
 
@@ -18,12 +18,14 @@ if (!pdfPath) {
   process.exit(1);
 }
 
-const freeTextAnnotations = (await readFreeTextAnnotations(pdfPath)).map((annotation) => ({
-  label: annotation.label,
-  x: annotation.x,
-  y: annotation.y,
-  rect: annotation.rect,
-}));
+const freeTextAnnotations = (await readFreeTextAnnotations(pdfPath)).map(
+  (annotation) => ({
+    label: annotation.label,
+    x: annotation.x,
+    y: annotation.y,
+    rect: annotation.rect,
+  }),
+);
 
 if (jsonMode) {
   console.log(JSON.stringify(freeTextAnnotations, null, 2));
@@ -32,9 +34,11 @@ if (jsonMode) {
 
 for (const annotation of freeTextAnnotations) {
   const unknownKeySuffix =
-    annotation.label && !CANONICAL_KEYS.has(annotation.label) ? "  ⚠ UNKNOWN KEY" : "";
+    annotation.label && !CANONICAL_KEYS.has(annotation.label)
+      ? "  ⚠ UNKNOWN KEY"
+      : "";
 
   console.log(
-    `${annotation.label} / x=${annotation.x} / y=${annotation.y} / rect=[${annotation.rect.join(", ")}]${unknownKeySuffix}`
+    `${annotation.label} / x=${annotation.x} / y=${annotation.y} / rect=[${annotation.rect.join(", ")}]${unknownKeySuffix}`,
   );
 }

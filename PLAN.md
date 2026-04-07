@@ -226,13 +226,16 @@ The annotation-based workflow is the primary way contributors add new forms. Thi
 ### What needs to be built
 
 #### 1. `FIELD_NAMES.md` (new)
+
 Single source of truth for canonical annotation label names. Contributors type EXACT keys from this table inside Preview text boxes when annotating a PDF.
 
 Content:
+
 - Naming conventions: `lowercase_snake_case`, `_year/_month/_day` suffix for date splits, `_2` suffix for duplicate sections
 - Table of 23 canonical keys with: key name, English description, Japanese label, example value, notes
 
 Canonical key set (derived from juminhyo + tenin schemas):
+
 ```
 name, furigana, address, phone
 dob_year, dob_month, dob_day
@@ -244,6 +247,7 @@ dob_year_2, dob_month_2, dob_day_2
 ```
 
 #### 2. `scripts/extract-annotations.mjs` (new — replaces `extract-coords.mjs`)
+
 Generic CLI that reads FreeText annotations from any annotated PDF.
 
 ```
@@ -260,6 +264,7 @@ node scripts/extract-annotations.mjs <annotated-pdf-path> [--json]
 Dependencies: `pdfjs-dist` (already in devDependencies), Node built-ins only.
 
 #### 3. `scripts/test-overlay.mjs` (rewrite)
+
 Replaces the hardcoded version. Reads annotations live from the annotated PDF, overlays sample data on the blank PDF.
 
 ```
@@ -276,6 +281,7 @@ node scripts/test-overlay.mjs <annotated-pdf-path> <blank-pdf-path> [output-path
 Dependencies: `pdf-lib`, `@pdf-lib/fontkit`, `pdfjs-dist`, Node built-ins. No new packages needed.
 
 #### 4. `CONTRIBUTING.md` — add "Annotation workflow" section
+
 Replace `extract-coords.mjs` references with the two-step workflow. The six-step flow:
 
 ```
@@ -294,14 +300,15 @@ Step 6 — Attach test-overlay output PDF to PR (required — reviewers cannot v
 Update PR checklist to require both scripts.
 
 #### 5. Delete `scripts/extract-coords.mjs`
+
 After `extract-annotations.mjs` is confirmed working. Not published to npm so no API concern.
 
 ### Files changed
 
-| File | Action |
-|------|--------|
-| `FIELD_NAMES.md` | Create |
-| `scripts/extract-annotations.mjs` | Create |
-| `scripts/test-overlay.mjs` | Rewrite |
-| `CONTRIBUTING.md` | Insert section + update script references |
-| `scripts/extract-coords.mjs` | Delete |
+| File                              | Action                                    |
+| --------------------------------- | ----------------------------------------- |
+| `FIELD_NAMES.md`                  | Create                                    |
+| `scripts/extract-annotations.mjs` | Create                                    |
+| `scripts/test-overlay.mjs`        | Rewrite                                   |
+| `CONTRIBUTING.md`                 | Insert section + update script references |
+| `scripts/extract-coords.mjs`      | Delete                                    |

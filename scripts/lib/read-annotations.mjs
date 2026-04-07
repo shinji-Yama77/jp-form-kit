@@ -13,10 +13,17 @@ export function resolveInputPath(inputPath, envRootVarName = "FORM_ROOT") {
 }
 
 export function getAnnotationLabel(annotation) {
-  return annotation.textContent?.join("").trim() ?? annotation.contentsObj?.str?.trim() ?? "";
+  return (
+    annotation.textContent?.join("").trim() ??
+    annotation.contentsObj?.str?.trim() ??
+    ""
+  );
 }
 
-export async function readFreeTextAnnotations(pdfPath, envRootVarName = "FORM_ROOT") {
+export async function readFreeTextAnnotations(
+  pdfPath,
+  envRootVarName = "FORM_ROOT",
+) {
   const resolvedPdfPath = resolveInputPath(pdfPath, envRootVarName);
   const data = new Uint8Array(readFileSync(resolvedPdfPath));
   const doc = await getDocument({ data }).promise;

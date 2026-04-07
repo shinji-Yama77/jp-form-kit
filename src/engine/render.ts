@@ -6,7 +6,11 @@ import { fileURLToPath } from "url";
 import type { OverlayFormSchema } from "../types.js";
 import { allForms } from "../forms/index.js";
 import { loadPdfBytes, resolvePdfBytes } from "./resolve-pdf.js";
-import { MissingFontError, MissingPdfError, UnknownSchemaError } from "./errors.js";
+import {
+  MissingFontError,
+  MissingPdfError,
+  UnknownSchemaError,
+} from "./errors.js";
 
 const BUNDLED_FONT_PATH = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -73,7 +77,10 @@ export async function renderOverlayPdf(
   } else if (options.assetRoot) {
     pdfBytes = resolvePdfBytes(resolvedSchema, options.assetRoot);
   } else {
-    throw new MissingPdfError(resolvedSchema.pdfFilename, "(no pdfPath or assetRoot provided)");
+    throw new MissingPdfError(
+      resolvedSchema.pdfFilename,
+      "(no pdfPath or assetRoot provided)",
+    );
   }
   const pdf = await PDFDocument.load(pdfBytes);
 

@@ -59,10 +59,14 @@ The package does not bundle blank PDFs. Download the official form from the gove
 
 ```ts
 // pass an exact path
-{ pdfPath: "./forms/juminhyo.pdf" }
+{
+  pdfPath: "./forms/juminhyo.pdf";
+}
 
 // or use the structured folder convention: {assetRoot}/{jurisdiction}/{id}/{filename}
-{ assetRoot: "./forms" }
+{
+  assetRoot: "./forms";
+}
 // resolves juminhyo to: ./forms/minato-ku/juminhyo/juminhyo.pdf
 ```
 
@@ -107,7 +111,7 @@ Generates a filled PDF and returns the output bytes as `Uint8Array`.
 
 - `schema` — an `OverlayFormSchema` object or schema id string such as `"juminhyo"`
 - `values` — record of field key to drawn string value
-- `options.pdfPath` — exact path to the blank source PDF *(takes priority over `assetRoot`)*
+- `options.pdfPath` — exact path to the blank source PDF _(takes priority over `assetRoot`)_
 - `options.assetRoot` — top-level folder for the blank PDF tree; resolves to `{assetRoot}/{jurisdiction}/{id}/{filename}`
 - `options.fontPath` — path to a Japanese-capable `.ttf` font; omit to use the bundled NotoSans JP
 

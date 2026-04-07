@@ -18,7 +18,10 @@ export function getPdfPath(
  * Resolves the blank source PDF for a schema from a local asset directory.
  * Throws MissingPdfError with a clear message if the file is not found.
  */
-export function loadPdfBytes(fullPath: string, pdfFilename: string): Uint8Array {
+export function loadPdfBytes(
+  fullPath: string,
+  pdfFilename: string,
+): Uint8Array {
   if (!existsSync(fullPath)) {
     throw new MissingPdfError(pdfFilename, fullPath);
   }

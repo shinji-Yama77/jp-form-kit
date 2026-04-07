@@ -5,7 +5,7 @@ import canonicalFieldMeta from "./config/canonical-field-meta.json" with { type:
 
 function usage() {
   console.error(
-    "Usage: node scripts/generate-schema.mjs <annotated-pdf> --id <form-id> --jurisdiction <slug> --pdf <pdf-filename> [--out <path>]"
+    "Usage: node scripts/generate-schema.mjs <annotated-pdf> --id <form-id> --jurisdiction <slug> --pdf <pdf-filename> [--out <path>]",
   );
 }
 
@@ -134,7 +134,9 @@ ${fields.map(toFieldLine).join("\n")}
 `;
 }
 
-const { annotatedPdfPath, id, jurisdiction, pdfFilename, outPath } = parseArgs(process.argv);
+const { annotatedPdfPath, id, jurisdiction, pdfFilename, outPath } = parseArgs(
+  process.argv,
+);
 
 if (outPath && existsSync(outPath)) {
   console.error(`Refusing to overwrite existing file: ${outPath}`);
@@ -143,7 +145,13 @@ if (outPath && existsSync(outPath)) {
 
 const annotations = await readFreeTextAnnotations(annotatedPdfPath);
 const fields = annotations.map(buildFieldObject);
-const source = buildSchemaSource({ id, jurisdiction, pdfFilename, outPath, fields });
+const source = buildSchemaSource({
+  id,
+  jurisdiction,
+  pdfFilename,
+  outPath,
+  fields,
+});
 
 if (outPath) {
   writeFileSync(outPath, source);
