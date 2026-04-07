@@ -10,9 +10,16 @@ import { MissingFontError, MissingPdfError, UnknownSchemaError } from "./errors.
 const DEFAULT_FONT_SIZE = 9;
 
 export interface RenderOptions {
-  /** Exact path to the blank source PDF. Takes priority over assetRoot if provided. */
+  /**
+   * Exact path to the blank source PDF.
+   * If provided, takes precedence over assetRoot — the engine loads this file directly.
+   */
   pdfPath?: string;
-  /** Directory where blank source PDFs live, following the {assetRoot}/{jurisdiction}/{id}/{filename} convention. */
+  /**
+   * Directory where blank source PDFs live.
+   * The engine resolves the path as {assetRoot}/{jurisdiction}/{id}/{pdfFilename}.
+   * Ignored if pdfPath is provided.
+   */
   assetRoot?: string;
   /** Path to a Japanese-capable .ttf font file (e.g. NotoSansJP-Regular.ttf). Required. */
   fontPath: string;
