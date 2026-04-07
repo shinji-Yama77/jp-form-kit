@@ -4,14 +4,14 @@ import { readFileSync, existsSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import type { OverlayFormSchema } from "../types.js";
+import { allForms } from "../forms/index.js";
+import { loadPdfBytes, resolvePdfBytes } from "./resolve-pdf.js";
+import { MissingFontError, MissingPdfError, UnknownSchemaError } from "./errors.js";
 
 const BUNDLED_FONT_PATH = join(
   dirname(fileURLToPath(import.meta.url)),
   "../assets/NotoSansJP-Regular.ttf",
 );
-import { allForms } from "../forms/index.js";
-import { resolvePdfBytes } from "./resolve-pdf.js";
-import { MissingFontError, MissingPdfError, UnknownSchemaError } from "./errors.js";
 
 const DEFAULT_FONT_SIZE = 9;
 
@@ -69,10 +69,7 @@ export async function renderOverlayPdf(
   // Resolve and load blank source PDF
   let pdfBytes: Uint8Array;
   if (options.pdfPath) {
-    if (!existsSync(options.pdfPath)) {
-      throw new MissingPdfError(resolvedSchema.pdfFilename, options.pdfPath);
-    }
-    pdfBytes = new Uint8Array(readFileSync(options.pdfPath));
+    pdfBytes = loadPdfBytes(options.pdfPath, resolvedSchema.pdfFilename);
   } else if (options.assetRoot) {
     pdfBytes = resolvePdfBytes(resolvedSchema, options.assetRoot);
   } else {
@@ -80,10 +77,10 @@ export async function renderOverlayPdf(
   }
   const pdf = await PDFDocument.load(pdfBytes);
 
-  // Load Japanese font — use bundled NotoSansJP if no fontPath provided
+  // Load font — falls back to bundled NotoSansJP if fontPath not provided
   const fontFullPath = options.fontPath ?? BUNDLED_FONT_PATH;
-  if (!existsSync(fontFullPath)) {
-    throw new MissingFontError(fontFullPath);
+  if (options.fontPath && !existsSync(options.fontPath)) {
+    throw new MissingFontError(options.fontPath);
   }
   pdf.registerFontkit(fontkit);
   const fontBytes = new Uint8Array(readFileSync(fontFullPath));

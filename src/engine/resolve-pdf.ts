@@ -18,13 +18,16 @@ export function getPdfPath(
  * Resolves the blank source PDF for a schema from a local asset directory.
  * Throws MissingPdfError with a clear message if the file is not found.
  */
+export function loadPdfBytes(fullPath: string, pdfFilename: string): Uint8Array {
+  if (!existsSync(fullPath)) {
+    throw new MissingPdfError(pdfFilename, fullPath);
+  }
+  return new Uint8Array(readFileSync(fullPath));
+}
+
 export function resolvePdfBytes(
   schema: OverlayFormSchema,
   assetRoot: string,
 ): Uint8Array {
-  const fullPath = getPdfPath(schema, assetRoot);
-  if (!existsSync(fullPath)) {
-    throw new MissingPdfError(schema.pdfFilename, fullPath);
-  }
-  return new Uint8Array(readFileSync(fullPath));
+  return loadPdfBytes(getPdfPath(schema, assetRoot), schema.pdfFilename);
 }
