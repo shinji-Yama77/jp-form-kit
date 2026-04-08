@@ -10,7 +10,6 @@ export const teninSchema: OverlayFormSchema = {
   jurisdiction: "minato-ku",
   lastVerifiedAt: "2026-02-06",
   verificationLocation: "港区役所 official website — city.minato.tokyo.jp",
-  warningThresholdDays: 180,
   description: "Register your new address at your local ward office",
   fields: [
     { key: "submit_year", x: 63, y: 519 },

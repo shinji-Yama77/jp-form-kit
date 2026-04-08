@@ -335,7 +335,6 @@ export const juminhyoSchema: OverlayFormSchema = {
   jurisdiction: "minato-ku",
   lastVerifiedAt: "", // TODO: set to YYYY-MM-DD after verifying against the live form
   verificationLocation: "", // TODO: e.g. "港区役所 official website — city.minato.tokyo.jp"
-  warningThresholdDays: 180,
   description: "", // TODO: one-line English description
   fields: [
     { key: "name", x: 83, y: 708 },

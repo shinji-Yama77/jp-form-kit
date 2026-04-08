@@ -121,7 +121,6 @@ export const ${schemaExportName}: OverlayFormSchema = {
   jurisdiction: "${jurisdiction}",
   lastVerifiedAt: "",
   verificationLocation: "",
-  warningThresholdDays: 180,
   description: "",
   fields: [
 ${fields.map(toFieldLine).join("\n")}

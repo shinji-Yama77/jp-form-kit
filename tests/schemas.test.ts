@@ -88,11 +88,6 @@ describe.each(allForms)("schema $id", (schema) => {
     ).toBe(true);
   });
 
-  it("uses a positive integer warning threshold", () => {
-    expect(Number.isInteger(schema.warningThresholdDays)).toBe(true);
-    expect(schema.warningThresholdDays).toBeGreaterThan(0);
-  });
-
   it("uses a parseable source URL", () => {
     expectParseableUrl(schema.sourceUrl);
   });

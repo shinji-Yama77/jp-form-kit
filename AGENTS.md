@@ -79,7 +79,6 @@ export interface OverlayFormSchema {
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"
   lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD)
   verificationLocation: string; // human-readable — e.g. "港区役所 official website — city.minato.tokyo.jp"
-  warningThresholdDays: number; // days before consuming apps show a staleness warning
   description: string; // one-line English description
   variants?: FormVariant[]; // additional language versions — variants may override coordinates when layouts differ
   fields: OverlayField[];

@@ -15,7 +15,6 @@ export const juminhyoSchema: OverlayFormSchema = {
   jurisdiction: "minato-ku",
   lastVerifiedAt: "2026-02-06",
   verificationLocation: "港区役所 official website — city.minato.tokyo.jp",
-  warningThresholdDays: 180,
   description:
     "Request a copy of your resident record — required for almost every other procedure",
   variants: [
