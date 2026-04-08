@@ -16,7 +16,6 @@ const REQUIRED_SCHEMA_STRING_FIELDS = [
   "titleJa",
   "titleEn",
   "pdfFilename",
-  "downloadName",
   "sourceUrl",
   "jurisdiction",
   "verificationLocation",
@@ -26,7 +25,6 @@ const REQUIRED_SCHEMA_STRING_FIELDS = [
 const REQUIRED_VARIANT_STRING_FIELDS = [
   "lang",
   "pdfFilename",
-  "downloadName",
   "sourceUrl",
 ] as const;
 

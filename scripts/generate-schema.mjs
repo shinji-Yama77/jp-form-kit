@@ -116,7 +116,6 @@ export const ${schemaExportName}: OverlayFormSchema = {
   titleJa: "",
   titleEn: "",
   pdfFilename: "${pdfFilename}",
-  downloadName: "${pdfFilename}",
   sourceUrl: "",
   category: "ward",
   jurisdiction: "${jurisdiction}",

@@ -127,7 +127,7 @@ Each form schema includes:
 
 - stable form metadata such as `id`, `titleJa`, `titleEn`, `category`, and `jurisdiction`
 - provenance such as `sourceUrl`, `lastVerifiedAt`, and `verificationLocation`
-- file hints such as `pdfFilename` and `downloadName`
+- file hints such as `pdfFilename`
 - a `fields` array containing base overlay coordinates and field labels
 - optional `variants` entries that can override `pdfFilename` and `fields` when another language PDF uses a different layout
 

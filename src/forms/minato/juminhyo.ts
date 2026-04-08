@@ -10,7 +10,6 @@ export const juminhyoSchema: OverlayFormSchema = {
   titleJa: "住民票等請求書",
   titleEn: "Resident record request",
   pdfFilename: "juminhyo.pdf",
-  downloadName: "juminhyo.pdf",
   sourceUrl: "https://www.city.minato.tokyo.jp/",
   category: "ward",
   jurisdiction: "minato-ku",
@@ -23,7 +22,6 @@ export const juminhyoSchema: OverlayFormSchema = {
     {
       lang: "en",
       pdfFilename: "juminhyo-en.pdf",
-      downloadName: "juminhyo-en.pdf",
       sourceUrl: "https://www.city.minato.tokyo.jp/",
     },
   ],

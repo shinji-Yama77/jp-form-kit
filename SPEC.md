@@ -330,7 +330,6 @@ export const juminhyoSchema: OverlayFormSchema = {
   titleJa: "", // TODO: fill in official Japanese form title
   titleEn: "", // TODO: fill in English translation
   pdfFilename: "juminhyo.pdf",
-  downloadName: "juminhyo.pdf",
   sourceUrl: "", // TODO: official government URL
   category: "ward", // TODO: ward | immigration | pension | employment | banking | housing
   jurisdiction: "minato-ku",

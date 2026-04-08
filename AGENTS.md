@@ -65,7 +65,6 @@ export interface OverlayField {
 export interface FormVariant {
   lang: "ja" | "en"; // language of this PDF version
   pdfFilename: string; // filename for this language's PDF
-  downloadName: string; // suggested export filename
   sourceUrl: string; // URL where this specific PDF version was obtained
   fields?: OverlayField[]; // optional variant-specific coordinates when layouts differ
 }
@@ -75,7 +74,6 @@ export interface OverlayFormSchema {
   titleJa: string; // official Japanese form title
   titleEn: string; // English translation
   pdfFilename: string; // just the filename — consumer app controls the base path
-  downloadName: string; // suggested filename for the exported PDF
   sourceUrl: string; // real government URL — must be verifiable
   category: FormCategory;
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"

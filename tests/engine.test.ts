@@ -134,7 +134,6 @@ describe("renderOverlayPdf", () => {
         {
           lang: "en",
           pdfFilename: "juminhyo-en.pdf",
-          downloadName: "juminhyo-en.pdf",
           sourceUrl: "https://www.city.minato.tokyo.jp/",
           fields: [
             {

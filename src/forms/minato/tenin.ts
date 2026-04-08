@@ -5,7 +5,6 @@ export const teninSchema: OverlayFormSchema = {
   titleJa: "転入届",
   titleEn: "Move-in notification",
   pdfFilename: "tenin.pdf",
-  downloadName: "tenin.pdf",
   sourceUrl: "https://www.city.minato.tokyo.jp/",
   category: "ward",
   jurisdiction: "minato-ku",

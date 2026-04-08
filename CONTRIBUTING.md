@@ -251,14 +251,12 @@ When a form has multiple language versions, use the `variants` field instead of 
 export const juminhyoSchema: OverlayFormSchema = {
   id: "juminhyo",
   pdfFilename: "juminhyo.pdf", // default — Japanese version
-  downloadName: "juminhyo.pdf",
   sourceUrl: "https://www.city.minato.tokyo.jp/",
   // ...
   variants: [
     {
       lang: "en",
       pdfFilename: "juminhyo-en.pdf",
-      downloadName: "juminhyo-en.pdf",
       sourceUrl: "https://www.city.minato.tokyo.jp/", // URL for the English PDF specifically
     },
   ],

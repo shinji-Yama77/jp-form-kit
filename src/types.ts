@@ -20,17 +20,15 @@ export interface OverlayField {
 export interface FormVariant {
   lang: "ja" | "en"; // language of this PDF version
   pdfFilename: string; // filename for this language's PDF — consumer app controls the path
-  downloadName: string; // suggested filename when exporting this variant
   sourceUrl: string; // URL where this specific PDF version was obtained
   fields?: OverlayField[]; // optional variant-specific coordinates when this PDF layout differs from the base form
 }
 
 export interface OverlayFormSchema {
   id: string; // kebab-case, unique across all schemas
-  titleJa: string; // official Japanese form title
-  titleEn: string; // English translation
+  titleJa: string; // official Japanese form title for display and review UIs
+  titleEn: string; // English display title or translation for consumers that need it
   pdfFilename: string; // blank PDF filename; full path is resolved by the engine from assetRoot + schema metadata
-  downloadName: string; // suggested filename for the exported PDF
   sourceUrl: string; // real government URL where the form was obtained — must be verifiable
   category: FormCategory;
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau", "smbc"
