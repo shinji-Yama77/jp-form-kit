@@ -67,6 +67,7 @@ export interface FormVariant {
   pdfFilename: string; // filename for this language's PDF
   downloadName: string; // suggested export filename
   sourceUrl: string; // URL where this specific PDF version was obtained
+  fields?: OverlayField[]; // optional variant-specific coordinates when layouts differ
 }
 
 export interface OverlayFormSchema {
@@ -82,7 +83,7 @@ export interface OverlayFormSchema {
   verificationLocation: string; // human-readable — e.g. "港区役所 official website — city.minato.tokyo.jp"
   warningThresholdDays: number; // days before consuming apps show a staleness warning
   description: string; // one-line English description
-  variants?: FormVariant[]; // additional language versions — fields and coordinates are shared
+  variants?: FormVariant[]; // additional language versions — variants may override coordinates when layouts differ
   fields: OverlayField[];
 }
 // NOTE: `free: boolean` from the original SmartLayer app has been removed — app-specific pricing

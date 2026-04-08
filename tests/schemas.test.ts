@@ -52,6 +52,9 @@ function expectValidVariant(variant: FormVariant) {
     expect(isNonEmptyString(variant[key])).toBe(true);
   }
   expectParseableUrl(variant.sourceUrl);
+  for (const field of variant.fields ?? []) {
+    expectValidField(field);
+  }
 }
 
 describe("allForms", () => {

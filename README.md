@@ -102,6 +102,7 @@ The package currently exposes:
 - `MissingPdfError`
 - `MissingFontError`
 - `UnknownSchemaError`
+- `UnknownVariantError`
 
 ## Engine API
 
@@ -113,6 +114,7 @@ Generates a filled PDF and returns the output bytes as `Uint8Array`.
 - `values` — record of field key to drawn string value
 - `options.pdfPath` — exact path to the blank source PDF _(takes priority over `assetRoot`)_
 - `options.assetRoot` — top-level folder for the blank PDF tree; resolves to `{assetRoot}/{jurisdiction}/{id}/{filename}`
+- `options.variantLang` — optional language variant selector; uses that variant's PDF filename and coordinates when present
 - `options.fontPath` — path to a Japanese-capable `.ttf` font; omit to use the bundled NotoSans JP
 
 ### `renderOverlayPdfToFile(schema, values, options, outputPath)`
@@ -126,7 +128,8 @@ Each form schema includes:
 - stable form metadata such as `id`, `titleJa`, `titleEn`, `category`, and `jurisdiction`
 - provenance such as `sourceUrl`, `lastVerifiedAt`, and `verificationLocation`
 - file hints such as `pdfFilename` and `downloadName`
-- a `fields` array containing overlay coordinates and field labels
+- a `fields` array containing base overlay coordinates and field labels
+- optional `variants` entries that can override `pdfFilename` and `fields` when another language PDF uses a different layout
 
 Field coordinates use PDF points with a bottom-left origin, matching common PDF drawing APIs such as `pdf-lib`.
 

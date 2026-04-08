@@ -28,3 +28,13 @@ export class UnknownSchemaError extends Error {
     this.name = "UnknownSchemaError";
   }
 }
+
+export class UnknownVariantError extends Error {
+  constructor(schemaId: string, variantLang: string) {
+    super(
+      `Unknown variant "${variantLang}" for schema "${schemaId}".\n` +
+        `Check schema.variants to see which language variants are available.`,
+    );
+    this.name = "UnknownVariantError";
+  }
+}

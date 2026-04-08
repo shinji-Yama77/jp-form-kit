@@ -5,4 +5,5 @@ export {
   MissingPdfError,
   MissingFontError,
   UnknownSchemaError,
+  UnknownVariantError,
 } from "./errors.js";

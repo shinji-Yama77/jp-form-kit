@@ -3,13 +3,14 @@ import fontkit from "@pdf-lib/fontkit";
 import { readFileSync, existsSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-import type { OverlayFormSchema } from "../types.js";
+import type { FormVariant, OverlayFormSchema } from "../types.js";
 import { allForms } from "../forms/index.js";
 import { loadPdfBytes, resolvePdfBytes } from "./resolve-pdf.js";
 import {
   MissingFontError,
   MissingPdfError,
   UnknownSchemaError,
+  UnknownVariantError,
 } from "./errors.js";
 
 const BUNDLED_FONT_PATH = join(
@@ -31,6 +32,11 @@ export interface RenderOptions {
    * Ignored if pdfPath is provided.
    */
   assetRoot?: string;
+  /**
+   * Language variant to render when a schema exposes alternate PDF layouts.
+   * If omitted, the base schema PDF and base fields are used.
+   */
+  variantLang?: FormVariant["lang"];
   /**
    * Path to a Japanese-capable .ttf font file (e.g. NotoSansJP-Regular.ttf).
    * If omitted, the bundled NotoSansJP-Regular font is used.
@@ -69,16 +75,40 @@ export async function renderOverlayPdf(
           return found;
         })()
       : schema;
+  const resolvedVariant =
+    options.variantLang === undefined
+      ? undefined
+      : (() => {
+          const found = resolvedSchema.variants?.find(
+            (variant) => variant.lang === options.variantLang,
+          );
+          if (!found) {
+            throw new UnknownVariantError(
+              resolvedSchema.id,
+              options.variantLang,
+            );
+          }
+          return found;
+        })();
+  const activePdfFilename =
+    resolvedVariant?.pdfFilename ?? resolvedSchema.pdfFilename;
+  const activeFields = resolvedVariant?.fields ?? resolvedSchema.fields;
 
   // Resolve and load blank source PDF
   let pdfBytes: Uint8Array;
   if (options.pdfPath) {
-    pdfBytes = loadPdfBytes(options.pdfPath, resolvedSchema.pdfFilename);
+    pdfBytes = loadPdfBytes(options.pdfPath, activePdfFilename);
   } else if (options.assetRoot) {
-    pdfBytes = resolvePdfBytes(resolvedSchema, options.assetRoot);
+    pdfBytes = resolvePdfBytes(
+      {
+        ...resolvedSchema,
+        pdfFilename: activePdfFilename,
+      },
+      options.assetRoot,
+    );
   } else {
     throw new MissingPdfError(
-      resolvedSchema.pdfFilename,
+      activePdfFilename,
       "(no pdfPath or assetRoot provided)",
     );
   }
@@ -95,7 +125,7 @@ export async function renderOverlayPdf(
 
   // Draw field values onto first page
   const page = pdf.getPages()[0];
-  for (const field of resolvedSchema.fields) {
+  for (const field of activeFields) {
     const value = values[field.key] ?? "";
     if (!value) continue;
     page.drawText(value, {

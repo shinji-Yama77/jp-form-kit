@@ -4,9 +4,11 @@ import {
   MissingFontError,
   MissingPdfError,
   UnknownSchemaError,
+  UnknownVariantError,
   getPdfPath,
   renderOverlayPdf,
 } from "../src/engine/index.js";
+import type { OverlayFormSchema } from "../src/types.js";
 import { juminhyoSchema } from "../src/forms/minato/juminhyo.js";
 
 describe("engine errors", () => {
@@ -26,6 +28,12 @@ describe("engine errors", () => {
     const error = new UnknownSchemaError("missing-schema");
     expect(error).toBeInstanceOf(Error);
     expect(error).toBeInstanceOf(UnknownSchemaError);
+  });
+
+  it("exposes UnknownVariantError as an Error subclass", () => {
+    const error = new UnknownVariantError("juminhyo", "en");
+    expect(error).toBeInstanceOf(Error);
+    expect(error).toBeInstanceOf(UnknownVariantError);
   });
 });
 
@@ -76,6 +84,20 @@ describe("renderOverlayPdf", () => {
     ).rejects.toBeInstanceOf(UnknownSchemaError);
   });
 
+  it("throws UnknownVariantError for an unknown schema variant", async () => {
+    await expect(
+      renderOverlayPdf(
+        juminhyoSchema,
+        {},
+        {
+          pdfPath: "forms/juminhyo.pdf",
+          fontPath: "assets/NotoSansJP-Regular.ttf",
+          variantLang: "ja",
+        },
+      ),
+    ).rejects.toBeInstanceOf(UnknownVariantError);
+  });
+
   it("throws MissingFontError for a nonexistent explicit fontPath", async () => {
     await expect(
       renderOverlayPdf(
@@ -98,6 +120,49 @@ describe("renderOverlayPdf", () => {
       {
         pdfPath: "forms/juminhyo.pdf",
         fontPath: "assets/NotoSansJP-Regular.ttf",
+      },
+    );
+
+    expect(bytes).toBeInstanceOf(Uint8Array);
+    expect(Buffer.from(bytes.subarray(0, 4)).toString("utf8")).toBe("%PDF");
+  });
+
+  it("uses variant-specific fields when a variant overrides coordinates", async () => {
+    const variantSchema: OverlayFormSchema = {
+      ...juminhyoSchema,
+      variants: [
+        {
+          lang: "en",
+          pdfFilename: "juminhyo-en.pdf",
+          downloadName: "juminhyo-en.pdf",
+          sourceUrl: "https://www.city.minato.tokyo.jp/",
+          fields: [
+            {
+              key: "name",
+              x: 200,
+              y: 200,
+            },
+          ],
+        },
+      ],
+      fields: [
+        {
+          key: "name",
+          x: 10,
+          y: 10,
+        },
+      ],
+    };
+
+    const bytes = await renderOverlayPdf(
+      variantSchema,
+      {
+        name: "SMITH JOHN",
+      },
+      {
+        pdfPath: "forms/juminhyo.pdf",
+        fontPath: "assets/NotoSansJP-Regular.ttf",
+        variantLang: "en",
       },
     );
 

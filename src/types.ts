@@ -22,6 +22,7 @@ export interface FormVariant {
   pdfFilename: string; // filename for this language's PDF — consumer app controls the path
   downloadName: string; // suggested filename when exporting this variant
   sourceUrl: string; // URL where this specific PDF version was obtained
+  fields?: OverlayField[]; // optional variant-specific coordinates when this PDF layout differs from the base form
 }
 
 export interface OverlayFormSchema {
@@ -38,6 +39,6 @@ export interface OverlayFormSchema {
   pdfSha256?: string; // sha256 of the blank PDF at time of verification — run: shasum -a 256 form.pdf
   warningThresholdDays: number; // days before consuming apps should show a staleness warning
   description: string; // one-line English description
-  variants?: FormVariant[]; // additional language versions of the same form — fields and coordinates are shared
+  variants?: FormVariant[]; // additional language versions of the same form — variants may override coordinates when layouts differ
   fields: OverlayField[];
 }

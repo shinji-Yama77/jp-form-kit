@@ -13,4 +13,5 @@ export {
   MissingPdfError,
   MissingFontError,
   UnknownSchemaError,
+  UnknownVariantError,
 } from "./engine/index.js";
