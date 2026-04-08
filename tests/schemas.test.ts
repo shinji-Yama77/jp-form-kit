@@ -1,0 +1,110 @@
+import { describe, expect, it } from "vitest";
+import { allForms } from "../src/forms/index.js";
+import type { FormCategory, FormVariant, OverlayField } from "../src/types.js";
+
+const FORM_CATEGORIES: FormCategory[] = [
+  "ward",
+  "immigration",
+  "pension",
+  "employment",
+  "banking",
+  "housing",
+];
+
+const REQUIRED_SCHEMA_STRING_FIELDS = [
+  "id",
+  "titleJa",
+  "titleEn",
+  "pdfFilename",
+  "downloadName",
+  "sourceUrl",
+  "jurisdiction",
+  "verificationLocation",
+  "description",
+] as const;
+
+const REQUIRED_VARIANT_STRING_FIELDS = [
+  "lang",
+  "pdfFilename",
+  "downloadName",
+  "sourceUrl",
+] as const;
+
+const KEBAB_CASE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function expectParseableUrl(value: string) {
+  expect(() => new URL(value)).not.toThrow();
+}
+
+function expectValidField(field: OverlayField) {
+  expect(isNonEmptyString(field.key)).toBe(true);
+  expect(Number.isFinite(field.x)).toBe(true);
+  expect(Number.isFinite(field.y)).toBe(true);
+}
+
+function expectValidVariant(variant: FormVariant) {
+  for (const key of REQUIRED_VARIANT_STRING_FIELDS) {
+    expect(isNonEmptyString(variant[key])).toBe(true);
+  }
+  expectParseableUrl(variant.sourceUrl);
+}
+
+describe("allForms", () => {
+  it("is non-empty", () => {
+    expect(allForms.length).toBeGreaterThan(0);
+  });
+
+  it("has unique schema ids", () => {
+    const ids = allForms.map((schema) => schema.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+});
+
+describe.each(allForms)("schema $id", (schema) => {
+  it("has required non-empty string metadata", () => {
+    for (const key of REQUIRED_SCHEMA_STRING_FIELDS) {
+      expect(isNonEmptyString(schema[key])).toBe(true);
+    }
+  });
+
+  it("uses a kebab-case id", () => {
+    expect(schema.id).toMatch(KEBAB_CASE_PATTERN);
+  });
+
+  it("uses a valid category", () => {
+    expect(FORM_CATEGORIES).toContain(schema.category);
+  });
+
+  it("uses an empty or ISO-8601 verification date", () => {
+    expect(
+      schema.lastVerifiedAt === "" ||
+        ISO_DATE_PATTERN.test(schema.lastVerifiedAt),
+    ).toBe(true);
+  });
+
+  it("uses a positive integer warning threshold", () => {
+    expect(Number.isInteger(schema.warningThresholdDays)).toBe(true);
+    expect(schema.warningThresholdDays).toBeGreaterThan(0);
+  });
+
+  it("uses a parseable source URL", () => {
+    expectParseableUrl(schema.sourceUrl);
+  });
+
+  it("defines valid overlay fields", () => {
+    for (const field of schema.fields) {
+      expectValidField(field);
+    }
+  });
+
+  it("defines valid variants when present", () => {
+    for (const variant of schema.variants ?? []) {
+      expectValidVariant(variant);
+    }
+  });
+});
