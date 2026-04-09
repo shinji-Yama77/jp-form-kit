@@ -24,7 +24,7 @@ npm install
 
 ## Annotation workflow
 
-This is the end-to-end process for mapping a new form. Work through all six steps in order.
+This is the end-to-end process for mapping a new form. Work through all seven steps in order.
 
 ### Step 1 — Get the official PDF
 
@@ -52,7 +52,20 @@ To get machine-readable output (e.g. for scripting):
 node scripts/extract-annotations.mjs --json path/to/annotated.pdf
 ```
 
-### Step 4 — Generate the schema skeleton
+### Step 4 — Preview the overlay with sample data
+
+```bash
+FONT_PATH=/path/to/NotoSansJP-Regular.ttf \
+  node scripts/test-overlay.mjs path/to/annotated.pdf path/to/blank.pdf [output-path] [--values path/to/sample-values.json]
+```
+
+You can start from [`scripts/config/sample-values.example.json`](./scripts/config/sample-values.example.json) and edit only the keys relevant to your form.
+
+This draws red bounding boxes at each field's coordinates on the blank PDF, with sample values filled in blue. Open the output and confirm every box sits on the correct form field before you generate the final schema.
+
+> The red debug boxes only appear in this script. They do **not** appear in the production output from `renderOverlayPdf`.
+
+### Step 5 — Generate the schema skeleton
 
 ```bash
 node scripts/generate-schema.mjs path/to/annotated.pdf \
@@ -87,7 +100,7 @@ You can start from [`scripts/config/schema-metadata.example.json`](./scripts/con
 
 The script will refuse to overwrite an existing file.
 
-### Step 5 — Fill in the TODOs
+### Step 6 — Fill in the TODOs
 
 Open the generated file and fill in the fields marked `// TODO`:
 
@@ -101,18 +114,7 @@ Open the generated file and fill in the fields marked `// TODO`:
 - `key` must be unique within this form
 - Never rename a `key` in an already-published schema — it is a breaking change
 
-### Step 6 — Verify alignment
-
-```bash
-FONT_PATH=/path/to/NotoSansJP-Regular.ttf \
-  node scripts/test-overlay.mjs path/to/annotated.pdf path/to/blank.pdf [output-path] [--values path/to/sample-values.json]
-
-You can start from [`scripts/config/sample-values.example.json`](./scripts/config/sample-values.example.json) and edit only the keys relevant to your form.
-````
-
-This draws red bounding boxes at each field's coordinates on the blank PDF, with sample values filled in blue. Open the output and confirm every box sits on the correct form field.
-
-> The red debug boxes only appear in this script. They do **not** appear in the production output from `renderOverlayPdf`.
+### Step 7 — Attach the verification output to your PR
 
 **This output PDF is required for your PR.** Attach it to the PR description as proof of correct alignment.
 
@@ -298,3 +300,4 @@ Japanese government forms change occasionally. If you know a form has changed:
 4. Submit a PR — this is a patch version bump
 
 If `sourceUrl` is dead or the form has moved, note this in the PR.
+````
