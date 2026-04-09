@@ -56,7 +56,6 @@ export interface OverlayField {
   x: number; // PDF x coordinate, bottom-left origin, in points
   y: number; // PDF y coordinate
   size?: number; // font size override (default 9pt used by the overlay engine)
-  vaultKey?: string; // if this field is a sub-part (e.g. dob_year), the parent data key (e.g. "dob")
   labelEn?: string; // English label for review UIs
   labelJa?: string; // Japanese label for review UIs
   required?: boolean;
@@ -78,8 +77,6 @@ export interface OverlayFormSchema {
   category: FormCategory;
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"
   lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD)
-  verificationLocation: string; // human-readable — e.g. "港区役所 official website — city.minato.tokyo.jp"
-  description: string; // one-line English description
   variants?: FormVariant[]; // additional language versions — variants may override coordinates when layouts differ
   fields: OverlayField[];
 }
@@ -114,7 +111,7 @@ Japanese government PDFs are almost always **flat** (no AcroForm fields). Coordi
 - Fix coordinates on existing schemas (patch version change)
 - Add new exports to `index.ts` files
 - Update `scripts/` tooling
-- Fix typos in `labelEn`, `labelJa`, `description`, `titleEn`
+- Fix typos in `labelEn`, `labelJa`, `titleEn`
 
 ### What requires care
 
@@ -153,8 +150,8 @@ Never fill in `x`/`y` values unless given real coordinates from the workflow out
 | ------ | ------- |
 
 | `extract-annotations.mjs` | Reads a Preview-annotated PDF using `pdfjs-dist`. Prints `label / x / y / rect` per FreeText annotation. Flags unknown canonical keys. Accepts `--json` for machine-readable output. |
-| `generate-schema.mjs` | Reads an annotated PDF and generates a TypeScript schema skeleton with coordinates, inferred `vaultKey` values, and `labelEn`/`labelJa` for known keys. Accepts `--id`, `--jurisdiction`, `--pdf`, `--out`. |
-| `test-overlay.mjs` | Takes `<annotated-pdf> <blank-pdf> [output-path]`. Reads annotations from the annotated PDF, then draws red bounding boxes and sample values onto the blank PDF. Set `FONT_PATH` to a Japanese-capable `.ttf` font. |
+| `generate-schema.mjs` | Reads an annotated PDF and generates a TypeScript schema skeleton with coordinates and `labelEn`/`labelJa` for known keys. Accepts `--id`, `--jurisdiction`, `--pdf`, `--out`, and optional `--meta` for schema metadata JSON. |
+| `test-overlay.mjs` | Takes `<annotated-pdf> <blank-pdf> [output-path] [--values values.json]`. Reads annotations from the annotated PDF, then draws red bounding boxes and sample values onto the blank PDF. Set `FONT_PATH` to a Japanese-capable `.ttf` font. |
 
 These scripts use `pdf-lib`, `pdfjs-dist`, and `fontkit` which are in `devDependencies`. They are never published.
 

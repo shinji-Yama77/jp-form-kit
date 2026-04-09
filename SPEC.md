@@ -24,31 +24,31 @@ The single source of truth for what label names are valid inside annotation text
 
 ### Canonical key table
 
-| Key                 | English Description      | Japanese Label    | Example Value         | Notes                                 |
-| ------------------- | ------------------------ | ----------------- | --------------------- | ------------------------------------- |
-| `name`              | Full Name                | 氏名              | 田中 太郎             | Primary applicant                     |
-| `furigana`          | Name (Katakana)          | フリガナ          | タナカ タロウ         | Primary applicant                     |
-| `address`           | Current Address          | 現住所 / 住所     | 東京都港区六本木1-1-1 | Primary applicant                     |
-| `phone`             | Phone Number             | 電話番号          | 090-1234-5678         | Primary applicant                     |
-| `dob_year`          | Birth Year               | 生年月日（年）    | 1990                  | Use `vaultKey: "dob"` in schema       |
-| `dob_month`         | Birth Month              | 生年月日（月）    | 05                    | Use `vaultKey: "dob"` in schema       |
-| `dob_day`           | Birth Day                | 生年月日（日）    | 15                    | Use `vaultKey: "dob"` in schema       |
-| `application_year`  | Application Year         | 申請年            | 2026                  | Date form is submitted                |
-| `application_month` | Application Month        | 申請月            | 04                    | Date form is submitted                |
-| `application_day`   | Application Day          | 申請日            | 06                    | Date form is submitted                |
-| `submit_year`       | Submission Year          | 届出年            | 2026                  | Alternative submission date key       |
-| `submit_month`      | Submission Month         | 届出月            | 04                    |                                       |
-| `submit_day`        | Submission Day           | 届出日            | 06                    |                                       |
-| `move_year`         | Move-in Year             | 転入年            | 2026                  | Use `vaultKey: "move_date"` in schema |
-| `move_month`        | Move-in Month            | 転入月            | 04                    | Use `vaultKey: "move_date"` in schema |
-| `move_day`          | Move-in Day              | 転入日            | 06                    | Use `vaultKey: "move_date"` in schema |
-| `name_2`            | Full Name (Person 2)     | 氏名（2人目）     | 田中 花子             | Second person / household member      |
-| `furigana_2`        | Name Katakana (Person 2) | フリガナ（2人目） | タナカ ハナコ         |                                       |
-| `address_2`         | Address (Person 2)       | 住所（2人目）     | 東京都港区六本木1-1-1 |                                       |
-| `phone_2`           | Phone (Person 2)         | 電話番号（2人目） | 090-8765-4321         |                                       |
-| `dob_year_2`        | Birth Year (Person 2)    | 生年（2人目）     | 1992                  | Use `vaultKey: "dob"` in schema       |
-| `dob_month_2`       | Birth Month (Person 2)   | 生月（2人目）     | 08                    |                                       |
-| `dob_day_2`         | Birth Day (Person 2)     | 生日（2人目）     | 20                    |                                       |
+| Key                 | English Description      | Japanese Label    | Example Value         | Notes                            |
+| ------------------- | ------------------------ | ----------------- | --------------------- | -------------------------------- |
+| `name`              | Full Name                | 氏名              | 田中 太郎             | Primary applicant                |
+| `furigana`          | Name (Katakana)          | フリガナ          | タナカ タロウ         | Primary applicant                |
+| `address`           | Current Address          | 現住所 / 住所     | 東京都港区六本木1-1-1 | Primary applicant                |
+| `phone`             | Phone Number             | 電話番号          | 090-1234-5678         | Primary applicant                |
+| `dob_year`          | Birth Year               | 生年月日（年）    | 1990                  |                                  |
+| `dob_month`         | Birth Month              | 生年月日（月）    | 05                    |                                  |
+| `dob_day`           | Birth Day                | 生年月日（日）    | 15                    |                                  |
+| `application_year`  | Application Year         | 申請年            | 2026                  | Date form is submitted           |
+| `application_month` | Application Month        | 申請月            | 04                    | Date form is submitted           |
+| `application_day`   | Application Day          | 申請日            | 06                    | Date form is submitted           |
+| `submit_year`       | Submission Year          | 届出年            | 2026                  | Alternative submission date key  |
+| `submit_month`      | Submission Month         | 届出月            | 04                    |                                  |
+| `submit_day`        | Submission Day           | 届出日            | 06                    |                                  |
+| `move_year`         | Move-in Year             | 転入年            | 2026                  |                                  |
+| `move_month`        | Move-in Month            | 転入月            | 04                    |                                  |
+| `move_day`          | Move-in Day              | 転入日            | 06                    |                                  |
+| `name_2`            | Full Name (Person 2)     | 氏名（2人目）     | 田中 花子             | Second person / household member |
+| `furigana_2`        | Name Katakana (Person 2) | フリガナ（2人目） | タナカ ハナコ         |                                  |
+| `address_2`         | Address (Person 2)       | 住所（2人目）     | 東京都港区六本木1-1-1 |                                  |
+| `phone_2`           | Phone (Person 2)         | 電話番号（2人目） | 090-8765-4321         |                                  |
+| `dob_year_2`        | Birth Year (Person 2)    | 生年（2人目）     | 1992                  |                                  |
+| `dob_month_2`       | Birth Month (Person 2)   | 生月（2人目）     | 08                    |                                  |
+| `dob_day_2`         | Birth Day (Person 2)     | 生日（2人目）     | 20                    |                                  |
 
 ---
 
@@ -268,7 +268,7 @@ node scripts/generate-schema.mjs formid_annotated.pdf \
   --out src/forms/ward/formid.ts
 ```
 
-This writes a TypeScript schema file with all field coordinates pre-filled from the annotations. Fill in the `// TODO` fields (`titleJa`, `titleEn`, `sourceUrl`, `description`, etc.) and you're done.
+This writes a TypeScript schema file with all field coordinates pre-filled from the annotations. Fill in any remaining metadata placeholders and you're done.
 
 If `--out` is omitted the schema is printed to stdout so you can preview it first.
 
@@ -334,8 +334,6 @@ export const juminhyoSchema: OverlayFormSchema = {
   category: "ward", // TODO: ward | immigration | pension | employment | banking | housing
   jurisdiction: "minato-ku",
   lastVerifiedAt: "", // TODO: set to YYYY-MM-DD after verifying against the live form
-  verificationLocation: "", // TODO: e.g. "港区役所 official website — city.minato.tokyo.jp"
-  description: "", // TODO: one-line English description
   fields: [
     { key: "name", x: 83, y: 708 },
     { key: "address", x: 91, y: 672 },
@@ -355,13 +353,6 @@ export const juminhyoSchema: OverlayFormSchema = {
 **Export name** — camelCase the `--id` value + `Schema` suffix: `juminhyo` → `juminhyoSchema`, `kenko-hoken` → `kenkoHokenSchema`
 
 **`category` default** — default to `"ward"` with a `// TODO` comment listing all valid values
-
-**`vaultKey` inference** — if a field key ends in `_year`, `_month`, or `_day`, infer the parent vault key and add it:
-
-- `dob_year` → `vaultKey: "dob"`
-- `dob_month` → `vaultKey: "dob"`
-- `move_year` → `vaultKey: "move_date"`
-- `application_year`, `submit_year` → no vaultKey (these are auto-populated from current date, not from vault)
 
 **`labelEn` / `labelJa`** — populated from the `FIELD_NAMES.md` canonical key table for known keys. Unknown keys get no labels.
 
@@ -526,6 +517,6 @@ After implementation, confirm:
 4. `node scripts/test-render.mjs` — writes `scripts/test-render-output.pdf`; open and confirm it looks like a real filled form with no debug marks
 5. Run `test-overlay.mjs` with a missing font path — confirm error message names `FONT_PATH` env var
 6. Run `extract-annotations.mjs` with no args — confirm usage message and exit 1
-7. `node scripts/generate-schema.mjs public/forms/juminhyo_en.pdf --id juminhyo --jurisdiction minato-ku --pdf juminhyo.pdf` — prints valid TypeScript to stdout with 3 fields, correct `vaultKey` inferences, and `// TODO` placeholders
+7. `node scripts/generate-schema.mjs public/forms/juminhyo_en.pdf --id juminhyo --jurisdiction minato-ku --pdf juminhyo.pdf` — prints valid TypeScript to stdout with 3 fields and `// TODO` placeholders
 8. Re-run with `--out` to a new path — confirm file is written; re-run again and confirm exit 1 (no overwrite)
 9. `npm run typecheck` — still passes (scripts are not TypeScript)

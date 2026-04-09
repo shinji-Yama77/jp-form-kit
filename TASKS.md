@@ -32,7 +32,6 @@ Implementation tasks derived from [SPEC.md](./SPEC.md). Work through these in or
 
 - [ ] Create `scripts/generate-schema.mjs` — reads annotated PDF, generates a TypeScript schema file skeleton
 - [ ] Implement `--id`, `--jurisdiction`, `--pdf`, `--out` CLI flags
-- [ ] Infer `vaultKey` for `_year` / `_month` / `_day` field suffixes (`dob_*` → `"dob"`, `move_*` → `"move_date"`)
 - [ ] Populate `labelEn` / `labelJa` for known canonical keys
 - [ ] Calculate correct relative import path depth from `--out` path
 - [ ] No-overwrite guard: exit 1 if `--out` file already exists
@@ -85,7 +84,7 @@ Run each of these and confirm it passes before marking done:
 - [ ] `node scripts/test-render.mjs` — output PDF written; open and confirm clean filled form, no debug marks
 - [ ] Run `test-overlay.mjs` with bad font path — error names `FONT_PATH` env var
 - [ ] Run `extract-annotations.mjs` with no args — usage message printed, exit 1
-- [ ] `node scripts/generate-schema.mjs /path/to/juminhyo-annotated.pdf --id juminhyo --jurisdiction minato-ku --pdf juminhyo.pdf` — valid TypeScript printed to stdout with correct `vaultKey` inferences and `// TODO` placeholders
+- [ ] `node scripts/generate-schema.mjs /path/to/juminhyo-annotated.pdf --id juminhyo --jurisdiction minato-ku --pdf juminhyo.pdf` — valid TypeScript printed to stdout with `// TODO` placeholders
 - [ ] Re-run above with `--out path/new-schema.ts` — file written; re-run again and confirm exit 1 (no overwrite)
 - [ ] `npm run typecheck` — passes
 

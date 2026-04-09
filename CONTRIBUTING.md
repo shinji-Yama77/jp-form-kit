@@ -61,15 +61,29 @@ node scripts/generate-schema.mjs path/to/annotated.pdf \
   --pdf my-form.pdf
 ```
 
-This reads your annotations and outputs a valid TypeScript schema skeleton with coordinates, inferred `vaultKey` values, and `labelEn`/`labelJa` populated for known canonical keys. To write directly to a file:
+This reads your annotations and outputs a valid TypeScript schema skeleton with coordinates and `labelEn`/`labelJa` populated for known canonical keys. To write directly to a file:
+
+````bash
+node scripts/generate-schema.mjs path/to/annotated.pdf \
+  --id my-form-id \
+  --jurisdiction minato-ku \
+  --pdf my-form.pdf \
+  --out src/forms/minato/my-form.ts
+
+If you already know the schema metadata, you can also pass a JSON file and have the generator fill those fields in for you:
 
 ```bash
 node scripts/generate-schema.mjs path/to/annotated.pdf \
   --id my-form-id \
   --jurisdiction minato-ku \
   --pdf my-form.pdf \
+  --meta scripts/config/schema-metadata.example.json \
   --out src/forms/minato/my-form.ts
-```
+````
+
+You can start from [`scripts/config/schema-metadata.example.json`](./scripts/config/schema-metadata.example.json) and edit it for the form you're adding.
+
+````
 
 The script will refuse to overwrite an existing file.
 
@@ -79,23 +93,22 @@ Open the generated file and fill in the fields marked `// TODO`:
 
 - `titleJa`, `titleEn` — official Japanese title and English translation
 - `sourceUrl` — the URL you downloaded the PDF from (must be a real, working government URL)
-- `verificationLocation` — human-readable location, e.g. `"港区役所 official website — city.minato.tokyo.jp"`
-- `description` — one-line English description
 - `lastVerifiedAt` — today's date in `YYYY-MM-DD` format
 - `category` — see `FormCategory` in `src/types.ts`
 
 **Field key rules:**
 
 - `key` must be unique within this form
-- For date sub-parts (year/month/day), `vaultKey` is inferred automatically by `generate-schema.mjs` — verify it looks right
 - Never rename a `key` in an already-published schema — it is a breaking change
 
 ### Step 6 — Verify alignment
 
 ```bash
 FONT_PATH=/path/to/NotoSansJP-Regular.ttf \
-  node scripts/test-overlay.mjs path/to/annotated.pdf path/to/blank.pdf [output-path]
-```
+  node scripts/test-overlay.mjs path/to/annotated.pdf path/to/blank.pdf [output-path] [--values path/to/sample-values.json]
+
+You can start from [`scripts/config/sample-values.example.json`](./scripts/config/sample-values.example.json) and edit only the keys relevant to your form.
+````
 
 This draws red bounding boxes at each field's coordinates on the blank PDF, with sample values filled in blue. Open the output and confirm every box sits on the correct form field.
 
