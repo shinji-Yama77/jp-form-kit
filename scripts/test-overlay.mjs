@@ -9,10 +9,37 @@ const DEFAULT_FONT_SIZE = 9;
 
 function usage() {
   console.error(
-    "Usage: node scripts/test-overlay.mjs <annotated-pdf> <blank-pdf> [output-path]\n" +
+    "Usage: node scripts/test-overlay.mjs <annotated-pdf> <blank-pdf> [output-path] [--values values.json]\n" +
       "Set FONT_PATH to a Japanese-capable .ttf font file, for example:\n" +
       "FONT_PATH=./fonts/NotoSansJP-Regular.ttf",
   );
+}
+
+function parseArgs(argv) {
+  const positional = [];
+  let valuesPath;
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+
+    if (arg === "--values") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) {
+        console.error("Missing path after --values");
+        process.exit(1);
+      }
+      valuesPath = value;
+      index += 1;
+      continue;
+    }
+
+    positional.push(arg);
+  }
+
+  const [annotatedPdfPath, blankPdfPath, outputPath = DEFAULT_OUTPUT_PATH] =
+    positional;
+
+  return { annotatedPdfPath, blankPdfPath, outputPath, valuesPath };
 }
 
 function buildSampleValue(label) {
@@ -37,8 +64,37 @@ function buildSampleValue(label) {
   return `[${label}]`;
 }
 
-const [annotatedPdfPath, blankPdfPath, outputPath = DEFAULT_OUTPUT_PATH] =
-  process.argv.slice(2);
+function loadValueOverrides(valuesPath) {
+  if (!valuesPath) return {};
+
+  if (!existsSync(valuesPath)) {
+    console.error(`Values file does not exist: "${valuesPath}"`);
+    process.exit(1);
+  }
+
+  const raw = readFileSync(valuesPath, "utf8");
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      console.error(
+        "Values file must contain a JSON object mapping field keys to sample strings.",
+      );
+      process.exit(1);
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error(
+      `Could not parse values JSON: "${valuesPath}"\n${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+const { annotatedPdfPath, blankPdfPath, outputPath, valuesPath } = parseArgs(
+  process.argv.slice(2),
+);
 
 if (!annotatedPdfPath || !blankPdfPath) {
   usage();
@@ -62,6 +118,7 @@ if (!existsSync(FONT_PATH)) {
 }
 
 const freeTextAnnotations = await readFreeTextAnnotations(annotatedPdfPath);
+const valueOverrides = loadValueOverrides(valuesPath);
 
 const blankPdf = await PDFDocument.load(readFileSync(blankPdfPath));
 blankPdf.registerFontkit(fontkit);
@@ -86,7 +143,10 @@ for (const annotation of freeTextAnnotations) {
     color: rgb(1, 0, 0),
   });
 
-  const value = buildSampleValue(annotation.label);
+  const value =
+    typeof valueOverrides[annotation.label] === "string"
+      ? valueOverrides[annotation.label]
+      : buildSampleValue(annotation.label);
   if (!value) continue;
 
   page.drawText(value, {

@@ -11,7 +11,6 @@ export interface OverlayField {
   x: number; // x coordinate in PDF points, bottom-left origin
   y: number; // y coordinate in PDF points
   size?: number; // font size override (default: 9pt)
-  vaultKey?: string; // if this field is a sub-part (e.g. dob_year), the parent data key (e.g. "dob")
   labelEn?: string; // English label for review UIs
   labelJa?: string; // Japanese label for review UIs
   required?: boolean;
@@ -33,9 +32,7 @@ export interface OverlayFormSchema {
   category: FormCategory;
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau", "smbc"
   lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD) — when schema was last checked against the live form
-  verificationLocation: string; // human-readable — e.g. "港区役所 official website — city.minato.tokyo.jp"
   pdfSha256?: string; // sha256 of the blank PDF at time of verification — run: shasum -a 256 form.pdf
-  description: string; // one-line English description
   variants?: FormVariant[]; // additional language versions of the same form — variants may override coordinates when layouts differ
   fields: OverlayField[];
 }

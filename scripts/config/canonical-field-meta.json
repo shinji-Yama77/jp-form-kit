@@ -1,8 +1,36 @@
 {
-  "name": { "labelEn": "Full Name", "labelJa": "氏名" },
   "furigana": { "labelEn": "Name (Katakana)", "labelJa": "フリガナ" },
-  "address": { "labelEn": "Address", "labelJa": "住所" },
-  "phone": { "labelEn": "Phone", "labelJa": "電話番号" },
+  "full_name": { "labelEn": "Full Name", "labelJa": "氏名" },
+  "home_address": { "labelEn": "Home Address", "labelJa": "住所" },
+  "contact_phone": {
+    "labelEn": "Daytime Contact Phone Number",
+    "labelJa": "昼間連絡のつく電話番号"
+  },
+  "head_of_household_name": {
+    "labelEn": "Head of Household Name",
+    "labelJa": "世帯主の氏名"
+  },
+  "counter_visitor_name": {
+    "labelEn": "Counter Visitor Name",
+    "labelJa": "窓口に来られた方の氏名"
+  },
+  "counter_visitor_address": {
+    "labelEn": "Counter Visitor Address",
+    "labelJa": "窓口に来られた方の住所"
+  },
+  "counter_visitor_phone": {
+    "labelEn": "Counter Visitor Phone",
+    "labelJa": "窓口に来られた方の電話番号"
+  },
+  "requester_name": { "labelEn": "Requester Name", "labelJa": "請求者の氏名" },
+  "requester_address": {
+    "labelEn": "Requester Address",
+    "labelJa": "請求者の住所"
+  },
+  "requester_phone": {
+    "labelEn": "Requester Phone",
+    "labelJa": "請求者の電話番号"
+  },
   "dob_year": { "labelEn": "Date of Birth", "labelJa": "生年月日" },
   "move_year": { "labelEn": "Move-in Date", "labelJa": "転入日" }
 }

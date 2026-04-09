@@ -1,11 +1,11 @@
-import { existsSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { dirname, relative } from "path";
 import { readFreeTextAnnotations } from "./lib/read-annotations.mjs";
 import canonicalFieldMeta from "./config/canonical-field-meta.json" with { type: "json" };
 
 function usage() {
   console.error(
-    "Usage: node scripts/generate-schema.mjs <annotated-pdf> --id <form-id> --jurisdiction <slug> --pdf <pdf-filename> [--out <path>]",
+    "Usage: node scripts/generate-schema.mjs <annotated-pdf> --id <form-id> --jurisdiction <slug> --pdf <pdf-filename> [--out <path>] [--meta <metadata.json>]",
   );
 }
 
@@ -38,19 +38,21 @@ function parseArgs(argv) {
   const jurisdiction = flagValues.get("--jurisdiction");
   const pdfFilename = flagValues.get("--pdf");
   const outPath = flagValues.get("--out");
+  const metaPath = flagValues.get("--meta");
 
   if (!id || !jurisdiction || !pdfFilename) {
     usage();
     process.exit(1);
   }
 
-  return { annotatedPdfPath, id, jurisdiction, pdfFilename, outPath };
-}
-
-function inferVaultKey(key) {
-  if (/^dob_(year|month|day)(_2)?$/.test(key)) return "dob";
-  if (/^move_(year|month|day)$/.test(key)) return "move_date";
-  return undefined;
+  return {
+    annotatedPdfPath,
+    id,
+    jurisdiction,
+    pdfFilename,
+    outPath,
+    metaPath,
+  };
 }
 
 function buildFieldObject(annotation) {
@@ -59,11 +61,6 @@ function buildFieldObject(annotation) {
     x: annotation.x,
     y: annotation.y,
   };
-
-  const inferredVaultKey = inferVaultKey(annotation.label);
-  if (inferredVaultKey) {
-    field.vaultKey = inferredVaultKey;
-  }
 
   const meta = canonicalFieldMeta[annotation.label];
   if (meta?.labelEn) {
@@ -79,8 +76,6 @@ function buildFieldObject(annotation) {
 function toFieldLine(field) {
   const parts = [`key: "${field.key}"`];
 
-  if (field.vaultKey) parts.push(`vaultKey: "${field.vaultKey}"`);
-
   parts.push(`x: ${field.x}`);
   parts.push(`y: ${field.y}`);
 
@@ -88,6 +83,10 @@ function toFieldLine(field) {
   if (field.labelJa) parts.push(`labelJa: "${field.labelJa}"`);
 
   return `    { ${parts.join(", ")} },`;
+}
+
+function serializeFieldLineWithIndent(field, indent = "    ") {
+  return `${indent}${toFieldLine(field).trimStart()}`;
 }
 
 function getImportPath(outPath) {
@@ -105,36 +104,90 @@ function getImportPath(outPath) {
   return importPath.replaceAll("\\", "/");
 }
 
-function buildSchemaSource({ id, jurisdiction, pdfFilename, outPath, fields }) {
+function loadMetadata(metaPath) {
+  if (!metaPath) return {};
+
+  if (!existsSync(metaPath)) {
+    console.error(`Metadata file does not exist: ${metaPath}`);
+    process.exit(1);
+  }
+
+  try {
+    const parsed = JSON.parse(readFileSync(metaPath, "utf8"));
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      console.error("Metadata file must contain a JSON object.");
+      process.exit(1);
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error(
+      `Could not parse metadata JSON: "${metaPath}"\n${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+function serializeVariants(variants) {
+  if (!Array.isArray(variants) || variants.length === 0) return "";
+
+  const entries = variants.map((variant) => {
+    const lines = [
+      `      lang: ${JSON.stringify(variant.lang)},`,
+      `      pdfFilename: ${JSON.stringify(variant.pdfFilename)},`,
+      `      sourceUrl: ${JSON.stringify(variant.sourceUrl)},`,
+    ];
+
+    if (Array.isArray(variant.fields) && variant.fields.length > 0) {
+      lines.push("      fields: [");
+      for (const field of variant.fields) {
+        lines.push(serializeFieldLineWithIndent(field, "        "));
+      }
+      lines.push("      ],");
+    }
+
+    return `    {\n${lines.join("\n")}\n    }`;
+  });
+
+  return `  variants: [\n${entries.join(",\n")}\n  ],\n`;
+}
+
+function buildSchemaSource({
+  id,
+  jurisdiction,
+  pdfFilename,
+  outPath,
+  fields,
+  metadata,
+}) {
   const importPath = getImportPath(outPath);
   const schemaExportName = `${id.replace(/-([a-z])/g, (_, char) => char.toUpperCase())}Schema`;
+  const variantsBlock = serializeVariants(metadata.variants);
 
   return `import type { OverlayFormSchema } from "${importPath}";
 
 export const ${schemaExportName}: OverlayFormSchema = {
   id: "${id}",
-  titleJa: "",
-  titleEn: "",
+  titleJa: ${JSON.stringify(metadata.titleJa ?? "")},
+  titleEn: ${JSON.stringify(metadata.titleEn ?? "")},
   pdfFilename: "${pdfFilename}",
-  sourceUrl: "",
-  category: "ward",
+  sourceUrl: ${JSON.stringify(metadata.sourceUrl ?? "")},
+  category: ${JSON.stringify(metadata.category ?? "ward")},
   jurisdiction: "${jurisdiction}",
-  lastVerifiedAt: "",
-  verificationLocation: "",
-  description: "",
-  fields: [
+  lastVerifiedAt: ${JSON.stringify(metadata.lastVerifiedAt ?? "")},
+${variantsBlock}  fields: [
 ${fields.map(toFieldLine).join("\n")}
   ],
 };
 
-// TODO: Fill in titleJa, titleEn, sourceUrl, verificationLocation, and description.
+// TODO: Fill in any remaining metadata placeholders before submitting.
 // TODO: Verify every generated field against the blank PDF before submitting.
 `;
 }
 
-const { annotatedPdfPath, id, jurisdiction, pdfFilename, outPath } = parseArgs(
-  process.argv,
-);
+const { annotatedPdfPath, id, jurisdiction, pdfFilename, outPath, metaPath } =
+  parseArgs(process.argv);
 
 if (outPath && existsSync(outPath)) {
   console.error(`Refusing to overwrite existing file: ${outPath}`);
@@ -143,12 +196,14 @@ if (outPath && existsSync(outPath)) {
 
 const annotations = await readFreeTextAnnotations(annotatedPdfPath);
 const fields = annotations.map(buildFieldObject);
+const metadata = loadMetadata(metaPath);
 const source = buildSchemaSource({
   id,
   jurisdiction,
   pdfFilename,
   outPath,
   fields,
+  metadata,
 });
 
 if (outPath) {

@@ -18,8 +18,6 @@ const REQUIRED_SCHEMA_STRING_FIELDS = [
   "pdfFilename",
   "sourceUrl",
   "jurisdiction",
-  "verificationLocation",
-  "description",
 ] as const;
 
 const REQUIRED_VARIANT_STRING_FIELDS = [

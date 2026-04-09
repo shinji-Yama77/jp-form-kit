@@ -1,0 +1,14 @@
+{
+  "titleJa": "住民票等請求書",
+  "titleEn": "Resident Record Request",
+  "sourceUrl": "https://www.city.minato.tokyo.jp/documents/9717/20260206101744.pdf",
+  "category": "ward",
+  "lastVerifiedAt": "2026-04-09",
+  "variants": [
+    {
+      "lang": "en",
+      "pdfFilename": "juminhyo-en.pdf",
+      "sourceUrl": "https://www.city.minato.tokyo.jp/"
+    }
+  ]
+}
