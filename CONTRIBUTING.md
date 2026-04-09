@@ -76,12 +76,13 @@ node scripts/generate-schema.mjs path/to/annotated.pdf \
 
 This reads your annotations and outputs a valid TypeScript schema skeleton with coordinates and `labelEn`/`labelJa` populated for known canonical keys. To write directly to a file:
 
-````bash
+```bash
 node scripts/generate-schema.mjs path/to/annotated.pdf \
   --id my-form-id \
   --jurisdiction minato-ku \
   --pdf my-form.pdf \
   --out src/forms/minato/my-form.ts
+```
 
 If you already know the schema metadata, you can also pass a JSON file and have the generator fill those fields in for you:
 
@@ -92,11 +93,9 @@ node scripts/generate-schema.mjs path/to/annotated.pdf \
   --pdf my-form.pdf \
   --meta scripts/config/schema-metadata.example.json \
   --out src/forms/minato/my-form.ts
-````
+```
 
 You can start from [`scripts/config/schema-metadata.example.json`](./scripts/config/schema-metadata.example.json) and edit it for the form you're adding.
-
-````
 
 The script will refuse to overwrite an existing file.
 
