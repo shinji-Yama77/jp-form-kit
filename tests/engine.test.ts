@@ -11,6 +11,8 @@ import {
 import type { OverlayFormSchema } from "../src/types.js";
 import { juminhyoSchema } from "../src/forms/minato/juminhyo.js";
 
+const TEST_FIXTURE_PDF = "tests/fixtures/minimal.pdf";
+
 describe("engine errors", () => {
   it("exposes MissingPdfError as an Error subclass", () => {
     const error = new MissingPdfError("form.pdf", "/tmp/form.pdf");
@@ -77,7 +79,7 @@ describe("renderOverlayPdf", () => {
         "missing-schema",
         {},
         {
-          pdfPath: "forms/juminhyo.pdf",
+          pdfPath: TEST_FIXTURE_PDF,
           fontPath: "assets/NotoSansJP-Regular.ttf",
         },
       ),
@@ -90,7 +92,7 @@ describe("renderOverlayPdf", () => {
         juminhyoSchema,
         {},
         {
-          pdfPath: "forms/juminhyo.pdf",
+          pdfPath: TEST_FIXTURE_PDF,
           fontPath: "assets/NotoSansJP-Regular.ttf",
           variantLang: "ja",
         },
@@ -104,7 +106,7 @@ describe("renderOverlayPdf", () => {
         juminhyoSchema,
         {},
         {
-          pdfPath: "forms/juminhyo.pdf",
+          pdfPath: TEST_FIXTURE_PDF,
           fontPath: "assets/does-not-exist.ttf",
         },
       ),
@@ -118,7 +120,7 @@ describe("renderOverlayPdf", () => {
         name: "SMITH JOHN",
       },
       {
-        pdfPath: "forms/juminhyo.pdf",
+        pdfPath: TEST_FIXTURE_PDF,
         fontPath: "assets/NotoSansJP-Regular.ttf",
       },
     );
@@ -160,7 +162,7 @@ describe("renderOverlayPdf", () => {
         name: "SMITH JOHN",
       },
       {
-        pdfPath: "forms/juminhyo.pdf",
+        pdfPath: TEST_FIXTURE_PDF,
         fontPath: "assets/NotoSansJP-Regular.ttf",
         variantLang: "en",
       },
