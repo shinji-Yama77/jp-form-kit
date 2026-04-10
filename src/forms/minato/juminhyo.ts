@@ -17,6 +17,7 @@ export const juminhyoSchema: OverlayFormSchema = {
       lang: "en",
       pdfFilename: "juminhyo-en.pdf",
       sourceUrl: "https://www.city.minato.tokyo.jp/",
+      lastVerifiedAt: "2026-04-09",
     }
   ],
   fields: [

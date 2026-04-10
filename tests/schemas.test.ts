@@ -24,6 +24,7 @@ const REQUIRED_VARIANT_STRING_FIELDS = [
   "lang",
   "pdfFilename",
   "sourceUrl",
+  "lastVerifiedAt",
 ] as const;
 
 const KEBAB_CASE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -47,6 +48,7 @@ function expectValidVariant(variant: FormVariant) {
   for (const key of REQUIRED_VARIANT_STRING_FIELDS) {
     expect(isNonEmptyString(variant[key])).toBe(true);
   }
+  expect(ISO_DATE_PATTERN.test(variant.lastVerifiedAt)).toBe(true);
   expectParseableUrl(variant.sourceUrl);
   for (const field of variant.fields ?? []) {
     expectValidField(field);

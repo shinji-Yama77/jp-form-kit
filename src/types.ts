@@ -20,6 +20,8 @@ export interface FormVariant {
   lang: "ja" | "en"; // language of this PDF version
   pdfFilename: string; // filename for this language's PDF — consumer app controls the path
   sourceUrl: string; // URL where this specific PDF version was obtained
+  lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD) — when this specific variant PDF was last checked against the live form
+  pdfSha256?: string; // sha256 of this variant PDF at time of verification — run: shasum -a 256 form.pdf
   fields?: OverlayField[]; // optional variant-specific coordinates when this PDF layout differs from the base form
 }
 

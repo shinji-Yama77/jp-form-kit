@@ -40,7 +40,7 @@ describe("engine errors", () => {
 describe("getPdfPath", () => {
   it("composes the expected asset-root path", () => {
     expect(getPdfPath(juminhyoSchema, "forms")).toBe(
-      "forms/minato-ku/juminhyo/juminhyo.pdf",
+      "forms/minato-ku/juminhyo/住民票等請求書.pdf",
     );
   });
 });
@@ -135,6 +135,7 @@ describe("renderOverlayPdf", () => {
           lang: "en",
           pdfFilename: "juminhyo-en.pdf",
           sourceUrl: "https://www.city.minato.tokyo.jp/",
+          lastVerifiedAt: "2026-04-09",
           fields: [
             {
               key: "name",
