@@ -24,7 +24,7 @@ npm install
 
 ## Annotation workflow
 
-This is the end-to-end process for mapping a new form. Work through all seven steps in order.
+This is the end-to-end process for mapping a new form. Work through all eight steps in order.
 
 ### Step 1 — Get the official PDF
 
@@ -38,13 +38,13 @@ Download the form from the official government website. Record the exact URL —
 
 See [FIELD_NAMES.md](./FIELD_NAMES.md) for the full list of canonical keys and naming conventions.
 
-### Step 3 — Extract and verify annotations
+### Step 3 — Extract annotation coordinates
 
 ```bash
 node scripts/extract-annotations.mjs path/to/annotated.pdf
 ```
 
-This prints each annotation's label, x/y coordinates, and rect. Any key not in the canonical list is flagged with `⚠ UNKNOWN KEY` — fix the annotation label before continuing.
+This prints each annotation's label, x/y coordinates, and rect. Treat this as a sanity check that Preview captured the annotations correctly. Any key not in the canonical list is flagged with `⚠ UNKNOWN KEY` — fix the annotation label before continuing.
 
 To get machine-readable output (e.g. for scripting):
 
@@ -52,7 +52,7 @@ To get machine-readable output (e.g. for scripting):
 node scripts/extract-annotations.mjs --json path/to/annotated.pdf
 ```
 
-### Step 4 — Preview the overlay with sample data
+### Step 4 — Verify alignment with a preview overlay
 
 ```bash
 FONT_PATH=/path/to/NotoSansJP-Regular.ttf \
@@ -61,7 +61,7 @@ FONT_PATH=/path/to/NotoSansJP-Regular.ttf \
 
 You can start from [`scripts/config/sample-values.example.json`](./scripts/config/sample-values.example.json) and edit only the keys relevant to your form.
 
-This draws red bounding boxes at each field's coordinates on the blank PDF, with sample values filled in blue. Open the output and confirm every box sits on the correct form field before you generate the final schema.
+This is the real coordinate verification step. The script draws red bounding boxes at each field's coordinates on the blank PDF, with sample values filled in blue. Open the output and confirm every box sits on the correct form field before you generate the final schema.
 
 > The red debug boxes only appear in this script. They do **not** appear in the production output from `renderOverlayPdf`.
 
@@ -121,6 +121,14 @@ This updates the existing schema in place by:
 
 Use the same canonical field keys across both language versions whenever they represent the same concept. Verify each language PDF separately against the real official file.
 
+**Variant filename convention:**
+
+- keep the base `pdfFilename` as the actual verified file name for the first contribution
+- for later language variants, use `{schema-id}-{lang}.pdf` when you need a short stable filename
+- example: `juminhyo-en.pdf`, `juminhyo-ja.pdf`
+
+This keeps variant filenames short, predictable, and aligned with the schema id rather than the full printed document title.
+
 ### Step 7 — Fill in the TODOs
 
 Open the generated file and fill in the fields marked `// TODO`:
@@ -135,7 +143,17 @@ Open the generated file and fill in the fields marked `// TODO`:
 - `key` must be unique within this form
 - Never rename a `key` in an already-published schema — it is a breaking change
 
-### Step 8 — Attach the verification output to your PR
+### Step 8 — Wire up exports and run typecheck
+
+Add your schema to the correct `index.ts` files and run:
+
+```bash
+npm run typecheck
+```
+
+The examples in the next section show exactly how to wire a form into an existing jurisdiction or add a new jurisdiction.
+
+### Step 9 — Attach the verification output to your PR
 
 **This output PDF is required for your PR.** Attach it to the PR description as proof of correct alignment.
 
@@ -309,6 +327,7 @@ export const juminhyoSchema: OverlayFormSchema = {
 
 - The top-level `pdfFilename`, `sourceUrl`, and `lastVerifiedAt` refer to the base version, meaning the first verified contribution for that form
 - Each variant has its own `sourceUrl` and `lastVerifiedAt`
+- When choosing a short variant filename, use `{schema-id}-{lang}.pdf` such as `juminhyo-en.pdf`
 - Coordinates may be shared only after both PDFs have been verified; if the English layout shifts any fields, add `variant.fields`
 
 ---

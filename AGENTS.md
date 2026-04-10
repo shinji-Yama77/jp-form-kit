@@ -118,6 +118,7 @@ Japanese government PDFs are almost always **flat** (no AcroForm fields). Coordi
 - **`sourceUrl`** — must always be a real, working URL to the official government source. Never invent or guess URLs.
 - **`lastVerifiedAt`** — only set this to a date when the schema has actually been checked against the live form. Do not set it to today's date speculatively.
 - **Base vs variant language** — the first verified PDF becomes the base schema. Later verified language versions should usually be added in `variants` rather than rebasing the existing schema.
+- **Variant filenames** — when contributors need a short filename for a later language variant, prefer `{schema-id}-{lang}.pdf` such as `juminhyo-en.pdf`.
 
 ### What you must NOT do
 
