@@ -16,8 +16,23 @@ export const juminhyoSchema: OverlayFormSchema = {
     {
       lang: "en",
       pdfFilename: "juminhyo-en.pdf",
-      sourceUrl: "https://www.city.minato.tokyo.jp/",
-      lastVerifiedAt: "2026-04-09",
+      sourceUrl: "https://www.city.minato.tokyo.jp/documents/9717/20260206101812.pdf",
+      lastVerifiedAt: "2026-04-10",
+      fields: [
+        { key: "full_name", x: 83, y: 708, labelEn: "Full Name", labelJa: "氏名" },
+        { key: "home_address", x: 91, y: 672, labelEn: "Home Address", labelJa: "住所" },
+        { key: "contact_phone", x: 419, y: 639, labelEn: "Daytime Contact Phone Number", labelJa: "昼間連絡のつく電話番号" },
+        { key: "counter_visitor_name", x: 63, y: 431, labelEn: "Counter Visitor Name", labelJa: "窓口に来られた方の氏名" },
+        { key: "counter_visitor_address", x: 62, y: 391, labelEn: "Counter Visitor Address", labelJa: "窓口に来られた方の住所" },
+        { key: "counter_visitor_phone", x: 420, y: 391, labelEn: "Counter Visitor Phone", labelJa: "窓口に来られた方の電話番号" },
+        { key: "application_year", x: 324, y: 751 },
+        { key: "application_day", x: 483, y: 751 },
+        { key: "head_of_household_name", x: 418, y: 708, labelEn: "Head of Household Name", labelJa: "世帯主の氏名" },
+        { key: "counter_visitor_dob", x: 420, y: 444 },
+        { key: "requester_name", x: 85, y: 328, labelEn: "Requester Name", labelJa: "請求者の氏名" },
+        { key: "requester_address", x: 83, y: 291, labelEn: "Requester Address", labelJa: "請求者の住所" },
+        { key: "requester_phone", x: 420, y: 300, labelEn: "Requester Phone", labelJa: "請求者の電話番号" },
+      ],
     }
   ],
   fields: [
