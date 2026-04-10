@@ -99,7 +99,29 @@ You can start from [`scripts/config/schema-metadata.example.json`](./scripts/con
 
 The script will refuse to overwrite an existing file.
 
-### Step 6 — Fill in the TODOs
+If you are contributing the first verified version of a form, this is the normal path.
+
+### Step 6 — Add a later Japanese or English variant to an existing schema
+
+If another contributor already added the base schema, you can attach your verified language PDF as a variant instead of rebuilding the whole file.
+
+```bash
+node scripts/generate-schema.mjs path/to/annotated-variant.pdf \
+  --variant-for src/forms/minato/my-form.ts \
+  --variant-lang en \
+  --pdf my-form-en.pdf \
+  --meta scripts/config/variant-metadata.example.json
+```
+
+This updates the existing schema in place by:
+
+- adding or replacing the variant with that `lang`
+- copying in the variant's `sourceUrl`, `lastVerifiedAt`, and optional `pdfSha256`
+- only writing `variant.fields` when the variant coordinates differ from the base schema
+
+Use the same canonical field keys across both language versions whenever they represent the same concept. Verify each language PDF separately against the real official file.
+
+### Step 7 — Fill in the TODOs
 
 Open the generated file and fill in the fields marked `// TODO`:
 
@@ -113,7 +135,7 @@ Open the generated file and fill in the fields marked `// TODO`:
 - `key` must be unique within this form
 - Never rename a `key` in an already-published schema — it is a breaking change
 
-### Step 7 — Attach the verification output to your PR
+### Step 8 — Attach the verification output to your PR
 
 **This output PDF is required for your PR.** Attach it to the PR description as proof of correct alignment.
 
@@ -259,12 +281,14 @@ PRs without the overlay PDF will not be merged — coordinates cannot be reviewe
 
 Some Japanese government forms are available in both Japanese and English — the same physical form, same fields, same coordinates, just different language labels printed on the PDF.
 
-When a form has multiple language versions, use the `variants` field instead of creating separate schemas. Field coordinates are shared across all variants because the form layout is identical.
+When a form has multiple language versions, use the `variants` field instead of creating separate schemas. Each variant must be verified against its own official PDF, and coordinates may be shared only if the layouts truly match.
+
+The repo policy is simple: the first verified contribution becomes the base schema. If the English version is contributed first, it becomes the base. If the Japanese version is contributed first, it becomes the base. Later verified language versions should be added through `variants` instead of rebasing the whole schema.
 
 ```typescript
 export const juminhyoSchema: OverlayFormSchema = {
   id: "juminhyo",
-  pdfFilename: "juminhyo.pdf", // default — Japanese version
+  pdfFilename: "juminhyo.pdf", // whichever verified PDF landed first
   sourceUrl: "https://www.city.minato.tokyo.jp/",
   // ...
   variants: [
@@ -272,6 +296,7 @@ export const juminhyoSchema: OverlayFormSchema = {
       lang: "en",
       pdfFilename: "juminhyo-en.pdf",
       sourceUrl: "https://www.city.minato.tokyo.jp/", // URL for the English PDF specifically
+      lastVerifiedAt: "2026-04-09",
     },
   ],
   fields: [
@@ -282,10 +307,10 @@ export const juminhyoSchema: OverlayFormSchema = {
 
 **Rules for variants:**
 
-- The top-level `pdfFilename` and `sourceUrl` always refer to the Japanese version (the primary)
-- Each variant has its own `sourceUrl` — if the English PDF is at a different URL, record it
-- Coordinates in `fields` must be verified against both PDFs — if the English layout shifts any fields, do not use variants; create a separate schema instead
-- Only add a variant if you have verified the English PDF and confirmed coordinates align
+- The top-level `pdfFilename`, `sourceUrl`, and `lastVerifiedAt` refer to the base version, meaning the first verified contribution for that form
+- Each variant has its own `sourceUrl` and `lastVerifiedAt`
+- If you compute checksums, record `pdfSha256` separately for the base PDF and each variant PDF
+- Coordinates may be shared only after both PDFs have been verified; if the English layout shifts any fields, add `variant.fields`
 
 ---
 
@@ -299,4 +324,7 @@ Japanese government forms change occasionally. If you know a form has changed:
 4. Submit a PR — this is a patch version bump
 
 If `sourceUrl` is dead or the form has moved, note this in the PR.
-````
+
+```
+
+```

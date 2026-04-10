@@ -12,8 +12,6 @@ This file tells Claude Code (and other AI coding agents) how this repo works, wh
 2. **Form schemas** — plain TypeScript objects describing the fields of Japanese government forms, organized by ward/institution under `src/forms/`
 3. **Contributor scripts** — Node.js + browser tools in `scripts/` for authoring new schemas (not published to npm)
 
-The published package (`dist/`) has **zero runtime dependencies**. It is pure compiled TypeScript — types and data objects only.
-
 ---
 
 ## Repo structure
@@ -30,9 +28,9 @@ src/
   index.ts              public package entry — only this file and what it re-exports is public API
 
 scripts/                contributor tooling — NOT part of the published package
-  extract-coords.mjs    reads a Preview-annotated PDF → prints annotation rects
+  extract-annotations.mjs reads a Preview-annotated PDF → prints annotation rects
   coord-picker.html     browser canvas tool — click PDF to record x/y coordinates
-  inspect-pdf.mjs       checks if a PDF has AcroForm fields or is flat
+  generate-schema.mjs   creates or augments schemas from annotated PDFs
   test-overlay.mjs      draws bounding boxes on a PDF to verify schema coordinates
 ```
 
@@ -65,18 +63,21 @@ export interface FormVariant {
   lang: "ja" | "en"; // language of this PDF version
   pdfFilename: string; // filename for this language's PDF
   sourceUrl: string; // URL where this specific PDF version was obtained
+  lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD) for this specific variant PDF
+  pdfSha256?: string; // sha256 of this variant PDF at time of verification
   fields?: OverlayField[]; // optional variant-specific coordinates when layouts differ
 }
 
 export interface OverlayFormSchema {
   id: string; // kebab-case, unique across all schemas
-  titleJa: string; // official Japanese form title
-  titleEn: string; // English translation
+  titleJa: string; // official Japanese form title for display and review UIs
+  titleEn: string; // English display title or translation for consumers that need it
   pdfFilename: string; // just the filename — consumer app controls the base path
   sourceUrl: string; // real government URL — must be verifiable
   category: FormCategory;
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"
   lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD)
+  pdfSha256?: string; // sha256 of the blank PDF at time of verification
   variants?: FormVariant[]; // additional language versions — variants may override coordinates when layouts differ
   fields: OverlayField[];
 }
@@ -95,8 +96,8 @@ Japanese government PDFs are almost always **flat** (no AcroForm fields). Coordi
 3. Running `node scripts/extract-annotations.mjs path/to/annotated.pdf`
 4. Script outputs `label / x / y / rect` per annotation; unknown keys are flagged with `⚠ UNKNOWN KEY`
 5. Schema uses `x`, `y` from the annotation's bottom-left corner
-6. Generate a schema skeleton with `node scripts/generate-schema.mjs` (see CONTRIBUTING.md)
-7. Verify with `FONT_PATH=... node scripts/test-overlay.mjs annotated.pdf blank.pdf` — draws red boxes on the blank PDF
+6. Verify with `FONT_PATH=... node scripts/test-overlay.mjs annotated.pdf blank.pdf --values ...` — draws red boxes on the blank PDF
+7. Generate or update a schema with `node scripts/generate-schema.mjs` (see CONTRIBUTING.md)
 
 **Coordinate system**: PDF points, origin at bottom-left of the page. x increases right, y increases up. This matches `pdf-lib`'s drawing API.
 
@@ -119,6 +120,7 @@ Japanese government PDFs are almost always **flat** (no AcroForm fields). Coordi
 - **Existing field `key` values** — never rename a `key` in an already-published schema. Consumer apps reference keys by name. Renaming is a breaking change.
 - **`sourceUrl`** — must always be a real, working URL to the official government source. Never invent or guess URLs.
 - **`lastVerifiedAt`** — only set this to a date when the schema has actually been checked against the live form. Do not set it to today's date speculatively.
+- **Base vs variant language** — the first verified PDF becomes the base schema. Later verified language versions should usually be added in `variants` rather than rebasing the existing schema.
 
 ### What you must NOT do
 
@@ -150,7 +152,7 @@ Never fill in `x`/`y` values unless given real coordinates from the workflow out
 | ------ | ------- |
 
 | `extract-annotations.mjs` | Reads a Preview-annotated PDF using `pdfjs-dist`. Prints `label / x / y / rect` per FreeText annotation. Flags unknown canonical keys. Accepts `--json` for machine-readable output. |
-| `generate-schema.mjs` | Reads an annotated PDF and generates a TypeScript schema skeleton with coordinates and `labelEn`/`labelJa` for known keys. Accepts `--id`, `--jurisdiction`, `--pdf`, `--out`, and optional `--meta` for schema metadata JSON. |
+| `generate-schema.mjs` | Creates a new schema from one annotated PDF or augments an existing schema with a later language variant. Accepts `--id`, `--jurisdiction`, `--pdf`, `--out`, and optional `--meta` in new-schema mode, or `--variant-for`, `--variant-lang`, `--pdf`, and optional `--meta` in variant mode. |
 | `test-overlay.mjs` | Takes `<annotated-pdf> <blank-pdf> [output-path] [--values values.json]`. Reads annotations from the annotated PDF, then draws red bounding boxes and sample values onto the blank PDF. Set `FONT_PATH` to a Japanese-capable `.ttf` font. |
 
 These scripts use `pdf-lib`, `pdfjs-dist`, and `fontkit` which are in `devDependencies`. They are never published.
