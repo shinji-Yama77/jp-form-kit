@@ -126,7 +126,7 @@ Convenience wrapper that renders and writes the generated PDF to disk.
 Each form schema includes:
 
 - stable form metadata such as `id`, `titleJa`, `titleEn`, `category`, and `jurisdiction`
-- provenance such as `sourceUrl`, `lastVerifiedAt`, and optional `pdfSha256`
+- provenance such as `sourceUrl` and `lastVerifiedAt`
 - file hints such as `pdfFilename`
 - a `fields` array containing base overlay coordinates and field labels
 - optional `variants` entries that can override `pdfFilename` and `fields` when another language PDF uses a different layout

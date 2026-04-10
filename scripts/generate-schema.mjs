@@ -98,7 +98,6 @@ function toFieldLine(field, indent = "    ") {
 
   if (field.labelEn) parts.push(`labelEn: "${field.labelEn}"`);
   if (field.labelJa) parts.push(`labelJa: "${field.labelJa}"`);
-  if (field.required === true) parts.push("required: true");
 
   return `${indent}{ ${parts.join(", ")} },`;
 }
@@ -147,10 +146,6 @@ function serializeVariantObject(variant, includeFields) {
     `      lastVerifiedAt: ${JSON.stringify(variant.lastVerifiedAt ?? "")},`,
   ];
 
-  if (variant.pdfSha256) {
-    lines.push(`      pdfSha256: ${JSON.stringify(variant.pdfSha256)},`);
-  }
-
   if (
     includeFields &&
     Array.isArray(variant.fields) &&
@@ -197,7 +192,7 @@ export const ${schemaExportName}: OverlayFormSchema = {
   category: ${JSON.stringify(metadata.category ?? "ward")},
   jurisdiction: "${jurisdiction}",
   lastVerifiedAt: ${JSON.stringify(metadata.lastVerifiedAt ?? "")},
-${metadata.pdfSha256 ? `  pdfSha256: ${JSON.stringify(metadata.pdfSha256)},\n` : ""}${serializeVariants(variantEntries)}  fields: [
+${serializeVariants(variantEntries)}  fields: [
 ${fields.map((field) => toFieldLine(field)).join("\n")}
   ],
 };
@@ -284,7 +279,6 @@ function normalizeField(field) {
     y: field.y,
     labelEn: field.labelEn ?? "",
     labelJa: field.labelJa ?? "",
-    required: field.required === true,
   });
 }
 
@@ -412,7 +406,6 @@ function buildVariantObject({
     pdfFilename,
     sourceUrl: metadata.sourceUrl ?? "",
     lastVerifiedAt: metadata.lastVerifiedAt ?? "",
-    pdfSha256: metadata.pdfSha256,
     fields: includeFields ? fields : undefined,
   };
 }

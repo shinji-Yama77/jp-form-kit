@@ -356,7 +356,7 @@ export const juminhyoSchema: OverlayFormSchema = {
 
 **`labelEn` / `labelJa`** — populated from the `FIELD_NAMES.md` canonical key table for known keys. Unknown keys get no labels.
 
-**`required`** — set `required: true` for `name`, `address`, `dob_year`, `dob_month`, `dob_day` by default (these are required on most forms). All other fields omit `required`.
+Do not infer required-vs-optional status from the PDF unless the repo explicitly reintroduces that metadata later. Field objects should stay objective: keys, coordinates, and labels only.
 
 **Field alignment** — align the `x:` and `y:` values in columns for readability (same style as existing schemas).
 

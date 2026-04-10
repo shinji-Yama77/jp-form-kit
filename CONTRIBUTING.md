@@ -116,7 +116,7 @@ node scripts/generate-schema.mjs path/to/annotated-variant.pdf \
 This updates the existing schema in place by:
 
 - adding or replacing the variant with that `lang`
-- copying in the variant's `sourceUrl`, `lastVerifiedAt`, and optional `pdfSha256`
+- copying in the variant's `sourceUrl` and `lastVerifiedAt`
 - only writing `variant.fields` when the variant coordinates differ from the base schema
 
 Use the same canonical field keys across both language versions whenever they represent the same concept. Verify each language PDF separately against the real official file.
@@ -309,7 +309,6 @@ export const juminhyoSchema: OverlayFormSchema = {
 
 - The top-level `pdfFilename`, `sourceUrl`, and `lastVerifiedAt` refer to the base version, meaning the first verified contribution for that form
 - Each variant has its own `sourceUrl` and `lastVerifiedAt`
-- If you compute checksums, record `pdfSha256` separately for the base PDF and each variant PDF
 - Coordinates may be shared only after both PDFs have been verified; if the English layout shifts any fields, add `variant.fields`
 
 ---

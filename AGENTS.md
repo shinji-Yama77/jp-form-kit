@@ -56,7 +56,6 @@ export interface OverlayField {
   size?: number; // font size override (default 9pt used by the overlay engine)
   labelEn?: string; // English label for review UIs
   labelJa?: string; // Japanese label for review UIs
-  required?: boolean;
 }
 
 export interface FormVariant {
@@ -64,7 +63,6 @@ export interface FormVariant {
   pdfFilename: string; // filename for this language's PDF
   sourceUrl: string; // URL where this specific PDF version was obtained
   lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD) for this specific variant PDF
-  pdfSha256?: string; // sha256 of this variant PDF at time of verification
   fields?: OverlayField[]; // optional variant-specific coordinates when layouts differ
 }
 
@@ -77,7 +75,6 @@ export interface OverlayFormSchema {
   category: FormCategory;
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau"
   lastVerifiedAt: string; // ISO 8601 date (YYYY-MM-DD)
-  pdfSha256?: string; // sha256 of the blank PDF at time of verification
   variants?: FormVariant[]; // additional language versions — variants may override coordinates when layouts differ
   fields: OverlayField[];
 }
