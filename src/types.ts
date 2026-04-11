@@ -27,7 +27,7 @@ export interface OverlayFormSchema {
   id: string; // kebab-case, unique across all schemas
   titleJa: string; // official Japanese form title for display and review UIs
   titleEn: string; // English display title or translation for consumers that need it
-  pdfFilename: string; // blank PDF filename; full path is resolved by the engine from assetRoot + schema metadata
+  pdfFilename: string; // blank PDF filename metadata for the verified source PDF
   sourceUrl: string; // real government URL where the form was obtained — must be verifiable
   category: FormCategory;
   jurisdiction: string; // filterable issuer slug — e.g. "minato-ku", "national", "immigration-bureau", "smbc"

@@ -5,7 +5,7 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import type { FormVariant, OverlayFormSchema } from "../types.js";
 import { allForms } from "../forms/index.js";
-import { loadPdfBytes, resolvePdfBytes } from "./resolve-pdf.js";
+import { loadPdfBytes } from "./resolve-pdf.js";
 import {
   MissingFontError,
   MissingPdfError,
@@ -23,15 +23,8 @@ const DEFAULT_FONT_SIZE = 9;
 export interface RenderOptions {
   /**
    * Exact path to the blank source PDF.
-   * If provided, takes precedence over assetRoot — the engine loads this file directly.
    */
-  pdfPath?: string;
-  /**
-   * Directory where blank source PDFs live.
-   * The engine resolves the path as {assetRoot}/{jurisdiction}/{id}/{pdfFilename}.
-   * Ignored if pdfPath is provided.
-   */
-  assetRoot?: string;
+  pdfPath: string;
   /**
    * Language variant to render when a schema exposes alternate PDF layouts.
    * If omitted, the base schema PDF and base fields are used.
@@ -49,7 +42,7 @@ export interface RenderOptions {
  *
  * @param schema  - OverlayFormSchema object, or a schema id string (e.g. "juminhyo")
  * @param values  - Record mapping each field key to the text value to draw
- * @param options - Asset root directory and font path
+ * @param options - PDF path, variant, and font options
  * @returns       - Generated PDF as a Uint8Array — write to disk or return to caller
  *
  * @example
@@ -95,23 +88,10 @@ export async function renderOverlayPdf(
   const activeFields = resolvedVariant?.fields ?? resolvedSchema.fields;
 
   // Resolve and load blank source PDF
-  let pdfBytes: Uint8Array;
-  if (options.pdfPath) {
-    pdfBytes = loadPdfBytes(options.pdfPath, activePdfFilename);
-  } else if (options.assetRoot) {
-    pdfBytes = resolvePdfBytes(
-      {
-        ...resolvedSchema,
-        pdfFilename: activePdfFilename,
-      },
-      options.assetRoot,
-    );
-  } else {
-    throw new MissingPdfError(
-      activePdfFilename,
-      "(no pdfPath or assetRoot provided)",
-    );
+  if (!options.pdfPath) {
+    throw new MissingPdfError(activePdfFilename, "(no pdfPath provided)");
   }
+  const pdfBytes = loadPdfBytes(options.pdfPath, activePdfFilename);
   const pdf = await PDFDocument.load(pdfBytes);
 
   // Load font — falls back to bundled NotoSansJP if fontPath not provided

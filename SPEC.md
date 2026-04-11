@@ -416,7 +416,7 @@ await renderOverlayPdfToFile(
     application_day: "06",
   },
   {
-    assetRoot: "./pdfs",
+    pdfPath: "./pdfs/juminhyo.pdf",
     fontPath: "./fonts/NotoSansJP-Regular.ttf",
   },
   "./output/juminhyo-filled.pdf",

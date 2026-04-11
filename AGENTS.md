@@ -136,7 +136,7 @@ When asked to scaffold a new form, do this:
 
 1. Create `src/forms/{ward}/{form-id}.ts` with the `OverlayFormSchema` structure
 2. Leave `fields: []` and add a comment `// TODO: coordinates need to be mapped via extract-coords.mjs workflow`
-3. Set `lastVerifiedAt` to an empty string `""` until verification is done
+3. Do not add the schema until it has been verified against a real PDF and can carry a real `lastVerifiedAt` date
 4. Export it from `src/forms/{ward}/index.ts` and `src/forms/index.ts`
 5. Add it to the `allForms` array in `src/forms/index.ts`
 

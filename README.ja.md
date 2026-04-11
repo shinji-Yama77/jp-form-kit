@@ -45,44 +45,21 @@ await renderOverlayPdfToFile(
     dob_day: "15",
   },
   {
-    assetRoot: "./pdfs",
+    pdfPath: "./pdfs/juminhyo.pdf",
     fontPath: "./fonts/NotoSansJP-Regular.ttf",
   },
   "./output/juminhyo-filled.pdf",
 );
 ```
 
-## PDF 配置ルール
+## 空 PDF の指定
 
-オーバーレイエンジンは、空 PDF を次のディレクトリ規約で探します。
-
-```text
-{assetRoot}/{jurisdiction}/{schema.id}/{pdfFilename}
-```
-
-例:
-
-```text
-pdfs/
-  minato-ku/
-    juminhyo/
-      juminhyo.pdf
-    tenin/
-      tenin.pdf
-```
-
-`assetRoot: "./pdfs"` を渡した場合、`juminhyo` は次のパスとして解決されます。
-
-```text
-./pdfs/minato-ku/juminhyo/juminhyo.pdf
-```
-
-期待されるパスは `getPdfPath` でも確認できます。
+このパッケージは空の公式 PDF を同梱しません。各スキーマの `sourceUrl` を見て利用側で取得し、`pdfPath` で明示的に渡してください。
 
 ```ts
-import { getPdfPath, juminhyoSchema } from "jp-form-kit";
-
-const path = getPdfPath(juminhyoSchema, "./pdfs");
+{
+  pdfPath: "./pdfs/juminhyo.pdf";
+}
 ```
 
 ## 主なエクスポート
@@ -95,7 +72,6 @@ const path = getPdfPath(juminhyoSchema, "./pdfs");
 - 各フォームスキーマ
 - `renderOverlayPdf`
 - `renderOverlayPdfToFile`
-- `getPdfPath`
 - `MissingPdfError`
 - `MissingFontError`
 - `UnknownSchemaError`
@@ -109,7 +85,7 @@ const path = getPdfPath(juminhyoSchema, "./pdfs");
 
 - `schema`: `OverlayFormSchema` または `"juminhyo"` のようなスキーマ ID
 - `values`: フィールドキーと描画文字列の対応表
-- `options.assetRoot`: 空 PDF を配置したルートディレクトリ
+- `options.pdfPath`: 空 PDF への明示的なパス
 - `options.variantLang`: 利用する言語バリアント。指定した場合、そのバリアントの `pdfFilename` と座標を優先
 - `options.fontPath`: 日本語描画に対応した `.ttf` フォントへのパス
 

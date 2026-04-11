@@ -58,24 +58,9 @@ A Japanese font (NotoSans JP) is bundled — no font configuration needed.
 The package does not bundle blank PDFs. Download the official form from the government website (see `sourceUrl` on each schema) and pass the path:
 
 ```ts
-// pass an exact path
 {
   pdfPath: "./forms/juminhyo.pdf";
 }
-
-// or use the structured folder convention: {assetRoot}/{jurisdiction}/{id}/{filename}
-{
-  assetRoot: "./forms";
-}
-// resolves juminhyo to: ./forms/minato-ku/juminhyo/juminhyo.pdf
-```
-
-You can inspect the resolved path directly:
-
-```ts
-import { getPdfPath, juminhyoSchema } from "jp-form-kit";
-
-const path = getPdfPath(juminhyoSchema, "./forms");
 ```
 
 ## Font
@@ -98,7 +83,6 @@ The package currently exposes:
 - individual schema exports
 - `renderOverlayPdf`
 - `renderOverlayPdfToFile`
-- `getPdfPath`
 - `MissingPdfError`
 - `MissingFontError`
 - `UnknownSchemaError`
@@ -112,8 +96,7 @@ Generates a filled PDF and returns the output bytes as `Uint8Array`.
 
 - `schema` — an `OverlayFormSchema` object or schema id string such as `"juminhyo"`
 - `values` — record of field key to drawn string value
-- `options.pdfPath` — exact path to the blank source PDF _(takes priority over `assetRoot`)_
-- `options.assetRoot` — top-level folder for the blank PDF tree; resolves to `{assetRoot}/{jurisdiction}/{id}/{filename}`
+- `options.pdfPath` — exact path to the blank source PDF
 - `options.variantLang` — optional language variant selector; uses that variant's PDF filename and coordinates when present
 - `options.fontPath` — path to a Japanese-capable `.ttf` font; omit to use the bundled NotoSans JP
 

@@ -5,7 +5,6 @@ import {
   MissingPdfError,
   UnknownSchemaError,
   UnknownVariantError,
-  getPdfPath,
   renderOverlayPdf,
 } from "../src/engine/index.js";
 import type { OverlayFormSchema } from "../src/types.js";
@@ -39,14 +38,6 @@ describe("engine errors", () => {
   });
 });
 
-describe("getPdfPath", () => {
-  it("composes the expected asset-root path", () => {
-    expect(getPdfPath(juminhyoSchema, "forms")).toBe(
-      "forms/minato-ku/juminhyo/住民票等請求書.pdf",
-    );
-  });
-});
-
 describe("renderOverlayPdf", () => {
   it("throws MissingPdfError for a nonexistent explicit pdfPath", async () => {
     await expect(
@@ -61,12 +52,13 @@ describe("renderOverlayPdf", () => {
     ).rejects.toBeInstanceOf(MissingPdfError);
   });
 
-  it("throws MissingPdfError when no pdfPath or assetRoot is provided", async () => {
+  it("fails compile-time if pdfPath is omitted and throws MissingPdfError for an empty explicit path", async () => {
     await expect(
       renderOverlayPdf(
         juminhyoSchema,
         {},
         {
+          pdfPath: "",
           fontPath: "assets/NotoSansJP-Regular.ttf",
         },
       ),

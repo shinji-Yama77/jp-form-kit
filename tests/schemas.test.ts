@@ -18,6 +18,7 @@ const REQUIRED_SCHEMA_STRING_FIELDS = [
   "pdfFilename",
   "sourceUrl",
   "jurisdiction",
+  "lastVerifiedAt",
 ] as const;
 
 const REQUIRED_VARIANT_STRING_FIELDS = [
@@ -81,11 +82,9 @@ describe.each(allForms)("schema $id", (schema) => {
     expect(FORM_CATEGORIES).toContain(schema.category);
   });
 
-  it("uses an empty or ISO-8601 verification date", () => {
-    expect(
-      schema.lastVerifiedAt === "" ||
-        ISO_DATE_PATTERN.test(schema.lastVerifiedAt),
-    ).toBe(true);
+  it("uses a non-empty ISO-8601 verification date", () => {
+    expect(isNonEmptyString(schema.lastVerifiedAt)).toBe(true);
+    expect(ISO_DATE_PATTERN.test(schema.lastVerifiedAt)).toBe(true);
   });
 
   it("uses a parseable source URL", () => {
