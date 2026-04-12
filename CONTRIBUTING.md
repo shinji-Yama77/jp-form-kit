@@ -97,7 +97,17 @@ node scripts/generate-schema.mjs path/to/annotated.pdf \
 
 You can start from [`scripts/config/schema-metadata.example.json`](./scripts/config/schema-metadata.example.json) and edit it for the form you're adding.
 
-The script will refuse to overwrite an existing file.
+The script will refuse to overwrite an existing file by default. If you intentionally want to replace an existing generated schema file, add `--force`:
+
+```bash
+node scripts/generate-schema.mjs path/to/annotated.pdf \
+  --id my-form-id \
+  --jurisdiction minato-ku \
+  --pdf my-form.pdf \
+  --meta scripts/config/schema-metadata.example.json \
+  --out src/forms/minato/my-form.ts \
+  --force
+```
 
 If you are contributing the first verified version of a form, this is the normal path.
 
@@ -118,6 +128,8 @@ This updates the existing schema in place by:
 - adding or replacing the variant with that `lang`
 - copying in the variant's `sourceUrl` and `lastVerifiedAt`
 - only writing `variant.fields` when the variant coordinates differ from the base schema
+
+If you are writing the updated schema to a separate `--out` path and want to replace an existing file at that destination, add `--force`.
 
 Use the same canonical field keys across both language versions whenever they represent the same concept. Verify each language PDF separately against the real official file.
 

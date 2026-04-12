@@ -22,6 +22,22 @@
     "labelEn": "Counter Visitor Phone",
     "labelJa": "窓口に来られた方の電話番号"
   },
+  "counter_visitor_dob": {
+    "labelEn": "Counter Visitor Date of Birth",
+    "labelJa": "窓口に来られた方の生年月日"
+  },
+  "counter_visitor_dob_year": {
+    "labelEn": "Counter Visitor Date of Birth",
+    "labelJa": "窓口に来られた方の生年月日"
+  },
+  "counter_visitor_dob_month": {
+    "labelEn": "Counter Visitor Date of Birth",
+    "labelJa": "窓口に来られた方の生年月日"
+  },
+  "counter_visitor_dob_day": {
+    "labelEn": "Counter Visitor Date of Birth",
+    "labelJa": "窓口に来られた方の生年月日"
+  },
   "requester_name": { "labelEn": "Requester Name", "labelJa": "請求者の氏名" },
   "requester_address": {
     "labelEn": "Requester Address",
@@ -31,6 +47,28 @@
     "labelEn": "Requester Phone",
     "labelJa": "請求者の電話番号"
   },
+  "requester_dob_year": {
+    "labelEn": "Requester Date of Birth",
+    "labelJa": "請求者の生年月日"
+  },
+  "requester_dob_month": {
+    "labelEn": "Requester Date of Birth",
+    "labelJa": "請求者の生年月日"
+  },
+  "requester_dob_day": {
+    "labelEn": "Requester Date of Birth",
+    "labelJa": "請求者の生年月日"
+  },
   "dob_year": { "labelEn": "Date of Birth", "labelJa": "生年月日" },
-  "move_year": { "labelEn": "Move-in Date", "labelJa": "転入日" }
+  "dob_month": { "labelEn": "Date of Birth", "labelJa": "生年月日" },
+  "dob_day": { "labelEn": "Date of Birth", "labelJa": "生年月日" },
+  "application_year": { "labelEn": "Application Date", "labelJa": "申請日" },
+  "application_month": { "labelEn": "Application Date", "labelJa": "申請日" },
+  "application_day": { "labelEn": "Application Date", "labelJa": "申請日" },
+  "submit_year": { "labelEn": "Submission Date", "labelJa": "提出日" },
+  "submit_month": { "labelEn": "Submission Date", "labelJa": "提出日" },
+  "submit_day": { "labelEn": "Submission Date", "labelJa": "提出日" },
+  "move_year": { "labelEn": "Move-in Date", "labelJa": "転入日" },
+  "move_month": { "labelEn": "Move-in Date", "labelJa": "転入日" },
+  "move_day": { "labelEn": "Move-in Date", "labelJa": "転入日" }
 }

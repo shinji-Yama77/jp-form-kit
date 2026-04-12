@@ -1,0 +1,130 @@
+import type { OverlayFormSchema } from "../../types.js";
+
+export const kosekiSchema: OverlayFormSchema = {
+  id: "koseki",
+  titleJa: "戸籍証明書等請求書",
+  titleEn: "Family Register Certificate",
+  pdfFilename: "koseki.pdf",
+  sourceUrl:
+    "https://www.city.minato.tokyo.jp/documents/9717/20260206081439.pdf",
+  category: "ward",
+  jurisdiction: "minato-ku",
+  lastVerifiedAt: "2026-04-12",
+  fields: [
+    {
+      key: "application_year",
+      x: 46,
+      y: 726,
+      labelEn: "Application Date",
+      labelJa: "申請日",
+    },
+    {
+      key: "application_month",
+      x: 127,
+      y: 722,
+      labelEn: "Application Date",
+      labelJa: "申請日",
+    },
+    {
+      key: "application_day",
+      x: 191,
+      y: 720,
+      labelEn: "Application Date",
+      labelJa: "申請日",
+    },
+    {
+      key: "head_of_household_name",
+      x: 141,
+      y: 663,
+      labelEn: "Head of Household Name",
+      labelJa: "世帯主の氏名",
+    },
+    {
+      key: "counter_visitor_name",
+      x: 88,
+      y: 458,
+      labelEn: "Counter Visitor Name",
+      labelJa: "窓口に来られた方の氏名",
+    },
+    {
+      key: "counter_visitor_phone",
+      x: 411,
+      y: 458,
+      labelEn: "Counter Visitor Phone",
+      labelJa: "窓口に来られた方の電話番号",
+    },
+    {
+      key: "counter_visitor_address",
+      x: 89,
+      y: 430,
+      labelEn: "Counter Visitor Address",
+      labelJa: "窓口に来られた方の住所",
+    },
+    {
+      key: "counter_visitor_dob_year",
+      x: 447,
+      y: 416,
+      labelEn: "Counter Visitor Date of Birth",
+      labelJa: "窓口に来られた方の生年月日",
+    },
+    {
+      key: "counter_visitor_dob_month",
+      x: 486,
+      y: 404,
+      labelEn: "Counter Visitor Date of Birth",
+      labelJa: "窓口に来られた方の生年月日",
+    },
+    {
+      key: "counter_visitor_dob_day",
+      x: 508,
+      y: 418,
+      labelEn: "Counter Visitor Date of Birth",
+      labelJa: "窓口に来られた方の生年月日",
+    },
+    {
+      key: "requester_name",
+      x: 89,
+      y: 359,
+      labelEn: "Requester Name",
+      labelJa: "請求者の氏名",
+    },
+    {
+      key: "requester_phone",
+      x: 412,
+      y: 359,
+      labelEn: "Requester Phone",
+      labelJa: "請求者の電話番号",
+    },
+    {
+      key: "requester_address",
+      x: 88,
+      y: 325,
+      labelEn: "Requester Address",
+      labelJa: "請求者の住所",
+    },
+    {
+      key: "requester_dob_year",
+      x: 446,
+      y: 319,
+      labelEn: "Requester Date of Birth",
+      labelJa: "請求者の生年月日",
+    },
+    {
+      key: "requester_dob_month",
+      x: 486,
+      y: 303,
+      labelEn: "Requester Date of Birth",
+      labelJa: "請求者の生年月日",
+    },
+    {
+      key: "requester_dob_day",
+      x: 509,
+      y: 311,
+      labelEn: "Requester Date of Birth",
+      labelJa: "請求者の生年月日",
+    },
+  ],
+};
+
+// TODO: Fill in any remaining metadata placeholders before submitting.
+// TODO: Verify every generated field against the blank PDF before submitting.

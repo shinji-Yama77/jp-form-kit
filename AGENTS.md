@@ -150,7 +150,7 @@ Never fill in `x`/`y` values unless given real coordinates from the workflow out
 | ------ | ------- |
 
 | `extract-annotations.mjs` | Reads a Preview-annotated PDF using `pdfjs-dist`. Prints `label / x / y / rect` per FreeText annotation. Flags unknown canonical keys. Accepts `--json` for machine-readable output. |
-| `generate-schema.mjs` | Creates a new schema from one annotated PDF or augments an existing schema with a later language variant. Accepts `--id`, `--jurisdiction`, `--pdf`, `--out`, and optional `--meta` in new-schema mode, or `--variant-for`, `--variant-lang`, `--pdf`, and optional `--meta` in variant mode. |
+| `generate-schema.mjs` | Creates a new schema from one annotated PDF or augments an existing schema with a later language variant. Accepts `--id`, `--jurisdiction`, `--pdf`, `--out`, optional `--meta`, and optional `--force` in new-schema mode, or `--variant-for`, `--variant-lang`, `--pdf`, optional `--meta`, optional `--out`, and optional `--force` in variant mode. |
 | `test-overlay.mjs` | Takes `<annotated-pdf> <blank-pdf> [output-path] [--values values.json]`. Reads annotations from the annotated PDF, then draws red bounding boxes and sample values onto the blank PDF. Set `FONT_PATH` to a Japanese-capable `.ttf` font. |
 
 These scripts use `pdf-lib`, `pdfjs-dist`, and `fontkit` which are in `devDependencies`. They are never published.

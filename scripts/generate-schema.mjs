@@ -7,10 +7,10 @@ import canonicalFieldMeta from "./config/canonical-field-meta.json" with { type:
 function usage() {
   console.error(`Usage:
   New schema:
-    node scripts/generate-schema.mjs <annotated-pdf> --id <form-id> --jurisdiction <slug> --pdf <pdf-filename> [--out <path>] [--meta <metadata.json>]
+    node scripts/generate-schema.mjs <annotated-pdf> --id <form-id> --jurisdiction <slug> --pdf <pdf-filename> [--out <path>] [--meta <metadata.json>] [--force]
 
   Add or update a variant on an existing schema:
-    node scripts/generate-schema.mjs <annotated-pdf> --variant-for <schema.ts> --variant-lang <lang> --pdf <pdf-filename> [--out <path>] [--meta <variant-metadata.json>]`);
+    node scripts/generate-schema.mjs <annotated-pdf> --variant-for <schema.ts> --variant-lang <lang> --pdf <pdf-filename> [--out <path>] [--meta <variant-metadata.json>] [--force]`);
 }
 
 function parseArgs(argv) {
@@ -23,10 +23,16 @@ function parseArgs(argv) {
   }
 
   const flagValues = new Map();
+  let force = false;
 
   for (let index = 1; index < args.length; index += 1) {
     const arg = args[index];
     if (!arg.startsWith("--")) continue;
+
+    if (arg === "--force") {
+      force = true;
+      continue;
+    }
 
     const value = args[index + 1];
     if (!value || value.startsWith("--")) {
@@ -56,6 +62,7 @@ function parseArgs(argv) {
       pdfFilename,
       outPath: flagValues.get("--out"),
       metaPath: flagValues.get("--meta"),
+      force,
     };
   }
 
@@ -76,6 +83,7 @@ function parseArgs(argv) {
     pdfFilename,
     outPath: flagValues.get("--out"),
     metaPath: flagValues.get("--meta"),
+    force,
   };
 }
 
@@ -452,8 +460,9 @@ const fields = annotations.map(buildFieldObject);
 const metadata = loadMetadata(parsed.metaPath);
 
 if (parsed.mode === "new") {
-  if (parsed.outPath && existsSync(parsed.outPath)) {
+  if (parsed.outPath && existsSync(parsed.outPath) && !parsed.force) {
     console.error(`Refusing to overwrite existing file: ${parsed.outPath}`);
+    console.error("Pass --force if you want to replace it intentionally.");
     process.exit(1);
   }
 
