@@ -1,0 +1,75 @@
+import type { OverlayFormSchema } from "../../types.js";
+
+export const inkanShomeiSchema: OverlayFormSchema = {
+  id: "inkan-shomei",
+  titleJa: "印鑑登録証明書交付申請書",
+  titleEn: "Application for Issuance of Certificate of Seal Impression",
+  pdfFilename: "inkan-shomei",
+  sourceUrl:
+    "https://www.city.minato.tokyo.jp/documents/9717/20260206081648.pdf",
+  category: "ward",
+  jurisdiction: "minato-ku",
+  lastVerifiedAt: "2026-04-13",
+  fields: [
+    {
+      key: "seal_registration_card_number",
+      x: 168,
+      y: 545,
+      labelEn: "Seal Registration Card Number",
+      labelJa: "印鑑登録証番号",
+    },
+    {
+      key: "home_address",
+      x: 155,
+      y: 514,
+      labelEn: "Home Address",
+      labelJa: "住所",
+    },
+    {
+      key: "furigana",
+      x: 113,
+      y: 489,
+      labelEn: "Name (Katakana)",
+      labelJa: "フリガナ",
+    },
+    { key: "full_name", x: 112, y: 465, labelEn: "Full Name", labelJa: "氏名" },
+    {
+      key: "contact_phone",
+      x: 110,
+      y: 400,
+      labelEn: "Daytime Contact Phone Number",
+      labelJa: "昼間連絡のつく電話番号",
+    },
+    {
+      key: "proxy_furigana",
+      x: 190,
+      y: 210,
+      labelEn: "Proxy Name (Katakana)",
+      labelJa: "代理人のフリガナ",
+    },
+    {
+      key: "proxy_name",
+      x: 190,
+      y: 186,
+      labelEn: "Proxy Name",
+      labelJa: "代理人の氏名",
+    },
+    {
+      key: "proxy_phone",
+      x: 190,
+      y: 157,
+      labelEn: "Proxy Phone",
+      labelJa: "代理人の電話番号",
+    },
+    {
+      key: "copy_count",
+      x: 110,
+      y: 368,
+      labelEn: "Number of Copies",
+      labelJa: "通数",
+    },
+  ],
+};
+
+// TODO: Fill in any remaining metadata placeholders before submitting.
+// TODO: Verify every generated field against the blank PDF before submitting.

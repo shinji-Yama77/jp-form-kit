@@ -47,6 +47,10 @@
     "labelEn": "Requester Phone",
     "labelJa": "請求者の電話番号"
   },
+  "seal_registration_card_number": {
+    "labelEn": "Seal Registration Card Number",
+    "labelJa": "印鑑登録証番号"
+  },
   "subject_address": {
     "labelEn": "Subject Address",
     "labelJa": "必要な方の住所"
@@ -74,6 +78,22 @@
   "subject_dob_day": {
     "labelEn": "Subject Date of Birth",
     "labelJa": "必要な方の生年月日"
+  },
+  "proxy_furigana": {
+    "labelEn": "Proxy Name (Katakana)",
+    "labelJa": "代理人のフリガナ"
+  },
+  "proxy_name": {
+    "labelEn": "Proxy Name",
+    "labelJa": "代理人の氏名"
+  },
+  "proxy_phone": {
+    "labelEn": "Proxy Phone",
+    "labelJa": "代理人の電話番号"
+  },
+  "copy_count": {
+    "labelEn": "Number of Copies",
+    "labelJa": "通数"
   },
   "requester_dob_year": {
     "labelEn": "Requester Date of Birth",
