@@ -4,7 +4,7 @@ export const juminhyoMailSchema: OverlayFormSchema = {
   id: "juminhyo-mail",
   titleJa: "住民票等請求書",
   titleEn: "Resident Record Request",
-  pdfFilename: "juminhyo-mail.pdf",
+  pdfFilename: "juminhyo-mail",
   sourceUrl:
     "https://www.city.minato.tokyo.jp/documents/9717/zyuuminnhyoutouseikyuusyo.pdf",
   category: "ward",
@@ -53,9 +53,27 @@ export const juminhyoMailSchema: OverlayFormSchema = {
       labelEn: "Requester Phone",
       labelJa: "請求者の電話番号",
     },
-    { key: "subject_address", x: 206, y: 646 },
-    { key: "subject_name", x: 177, y: 622 },
-    { key: "subject_head_of_household_name", x: 446, y: 616 },
+    {
+      key: "subject_address",
+      x: 206,
+      y: 646,
+      labelEn: "Subject Address",
+      labelJa: "必要な方の住所",
+    },
+    {
+      key: "subject_name",
+      x: 177,
+      y: 622,
+      labelEn: "Subject Name",
+      labelJa: "必要な方の氏名",
+    },
+    {
+      key: "subject_head_of_household_name",
+      x: 446,
+      y: 616,
+      labelEn: "Subject Head of Household Name",
+      labelJa: "必要な方の世帯主の氏名",
+    },
   ],
 };
 
