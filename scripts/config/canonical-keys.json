@@ -14,6 +14,8 @@
   "requester_name",
   "requester_address",
   "requester_phone",
+  "new_address",
+  "notification_contents",
   "requester_dob_year",
   "requester_dob_month",
   "requester_dob_day",

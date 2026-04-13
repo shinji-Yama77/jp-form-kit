@@ -47,6 +47,14 @@
     "labelEn": "Requester Phone",
     "labelJa": "請求者の電話番号"
   },
+  "new_address": {
+    "labelEn": "New Address",
+    "labelJa": "新しい住所"
+  },
+  "notification_contents": {
+    "labelEn": "Notification Details",
+    "labelJa": "届出内容"
+  },
   "seal_registration_card_number": {
     "labelEn": "Seal Registration Card Number",
     "labelJa": "印鑑登録証番号"
