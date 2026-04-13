@@ -15,5 +15,5 @@ export const minatoForms = [
   teninSchema,
   kosekiSchema,
   juminhyoMailSchema,
-  mibunShomeishoSchema
+  mibunShomeishoSchema,
 ];
