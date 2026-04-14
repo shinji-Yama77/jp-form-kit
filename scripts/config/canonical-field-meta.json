@@ -87,6 +87,10 @@
     "labelEn": "Subject Date of Birth",
     "labelJa": "必要な方の生年月日"
   },
+  "proxy_address": {
+    "labelEn": "Proxy Address",
+    "labelJa": "代理人の住所"
+  },
   "proxy_furigana": {
     "labelEn": "Proxy Name (Katakana)",
     "labelJa": "代理人のフリガナ"
@@ -95,9 +99,29 @@
     "labelEn": "Proxy Name",
     "labelJa": "代理人の氏名"
   },
+  "proxy_dob_year": {
+    "labelEn": "Proxy Date of Birth",
+    "labelJa": "代理人の生年月日"
+  },
+  "proxy_dob_month": {
+    "labelEn": "Proxy Date of Birth",
+    "labelJa": "代理人の生年月日"
+  },
+  "proxy_dob_day": {
+    "labelEn": "Proxy Date of Birth",
+    "labelJa": "代理人の生年月日"
+  },
   "proxy_phone": {
     "labelEn": "Proxy Phone",
     "labelJa": "代理人の電話番号"
+  },
+  "delegated_authority_summary": {
+    "labelEn": "Delegated Authority Summary",
+    "labelJa": "委任項目"
+  },
+  "delegated_authority_details": {
+    "labelEn": "Delegated Authority Details",
+    "labelJa": "委任内容"
   },
   "copy_count": {
     "labelEn": "Number of Copies",
