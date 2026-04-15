@@ -44,6 +44,6 @@ Contributors should use these exact keys when:
 
 ## Notes
 
-- These keys are derived from the current `juminhyo` and `tenin` schemas and the current annotation workflow.
+- These keys are derived from the current published schemas and the current annotation workflow.
 - New keys should be added carefully and only when an existing canonical key does not fit.
 - Japanese and English variants should use the same canonical keys whenever the fields mean the same thing, even if the coordinates differ.

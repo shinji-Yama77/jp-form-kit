@@ -127,7 +127,6 @@ src/
     minato/
       index.ts
       juminhyo.ts
-      tenin.ts
   engine/
     index.ts
     render.ts

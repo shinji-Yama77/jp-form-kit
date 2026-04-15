@@ -182,20 +182,18 @@ Add your schema to the jurisdiction's `index.ts`:
 ```typescript
 // src/forms/minato/index.ts
 export { juminhyoSchema } from "./juminhyo.js";
-export { teninSchema } from "./tenin.js";
 export { myFormSchema } from "./my-form.js"; // ← add this
 ```
 
 Then add it to `src/forms/index.ts`:
 
 ```typescript
-import { juminhyoSchema, teninSchema, myFormSchema } from "./minato/index.js";
+import { juminhyoSchema, myFormSchema } from "./minato/index.js";
 
 export * from "./minato/index.js";
 
 export const allForms = [
   juminhyoSchema,
-  teninSchema,
   myFormSchema, // ← add this
 ];
 ```
@@ -235,7 +233,7 @@ export { myFormSchema } from "./my-form.js";
 ### 3 — Wire into src/forms/index.ts
 
 ```typescript
-import { juminhyoSchema, teninSchema } from "./minato/index.js";
+import { juminhyoSchema } from "./minato/index.js";
 import { myFormSchema } from "./shinjuku-ku/index.js"; // ← add
 
 export * from "./minato/index.js";
@@ -243,7 +241,6 @@ export * from "./shinjuku-ku/index.js"; // ← add
 
 export const allForms = [
   juminhyoSchema,
-  teninSchema,
   myFormSchema, // ← add
 ];
 ```

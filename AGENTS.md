@@ -22,7 +22,6 @@ src/
   forms/
     minato/             forms from 港区役所 and related Minato ward institutions
       juminhyo.ts       住民票等請求書
-      tenin.ts          転入届
       index.ts          re-exports all minato schemas
     index.ts            re-exports all forms + exports allForms array
   index.ts              public package entry — only this file and what it re-exports is public API
