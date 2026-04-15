@@ -1,6 +1,6 @@
 {
   "name": "jp-form-kit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "TypeScript schema library and PDF overlay toolkit for Japanese government forms",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && mkdir -p dist/assets && cp -r assets/. dist/assets",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && mkdir -p dist/assets && cp -r assets/. dist/assets",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

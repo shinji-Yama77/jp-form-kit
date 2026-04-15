@@ -38,8 +38,8 @@ import { renderOverlayPdfToFile } from "jp-form-kit";
 await renderOverlayPdfToFile(
   "juminhyo",
   {
-    name: "SMITH JOHN",
-    address: "東京都港区六本木3-1-1",
+    full_name: "SMITH JOHN",
+    home_address: "東京都港区六本木3-1-1",
     dob_year: "1990",
     dob_month: "03",
     dob_day: "15",
@@ -52,6 +52,20 @@ await renderOverlayPdfToFile(
 ```
 
 A Japanese font (NotoSans JP) is bundled — no font configuration needed.
+
+## Supported Forms
+
+The package currently includes these verified Minato City forms:
+
+- `juminhyo` — Resident record request
+- `juminhyo-mail` — Resident record request by mail
+- `koseki` — Family register certificate request
+- `mibun-shomeisho` — Application for issuance of identity certificate
+- `inkan-shomei` — Application for issuance of seal registration certificate
+- `household-change-notification` — Notification for change of household and related items
+- `ininjo` — Letter of authorization
+
+More jurisdictions and forms can be added over time, but the current focus is keeping a smaller set accurate and well-verified.
 
 ## Supplying the Blank PDF
 
