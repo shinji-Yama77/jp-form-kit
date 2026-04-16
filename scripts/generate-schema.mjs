@@ -92,6 +92,8 @@ function buildFieldObject(annotation) {
     key: annotation.label,
     x: annotation.x,
     y: annotation.y,
+    width: annotation.width,
+    height: annotation.height,
   };
 
   const meta = canonicalFieldMeta[annotation.label];
@@ -104,6 +106,8 @@ function buildFieldObject(annotation) {
 function toFieldLine(field, indent = "    ") {
   const parts = [`key: "${field.key}"`, `x: ${field.x}`, `y: ${field.y}`];
 
+  if (field.width !== undefined) parts.push(`width: ${field.width}`);
+  if (field.height !== undefined) parts.push(`height: ${field.height}`);
   if (field.labelEn) parts.push(`labelEn: "${field.labelEn}"`);
   if (field.labelJa) parts.push(`labelJa: "${field.labelJa}"`);
 
@@ -285,6 +289,8 @@ function normalizeField(field) {
     key: field.key,
     x: field.x,
     y: field.y,
+    width: field.width ?? null,
+    height: field.height ?? null,
     labelEn: field.labelEn ?? "",
     labelJa: field.labelJa ?? "",
   });

@@ -135,6 +135,8 @@ describe("renderOverlayPdf", () => {
               key: "name",
               x: 200,
               y: 200,
+              width: 100,
+              height: 20,
             },
           ],
         },
@@ -144,6 +146,8 @@ describe("renderOverlayPdf", () => {
           key: "name",
           x: 10,
           y: 10,
+          width: 100,
+          height: 20,
         },
       ],
     };

@@ -10,6 +10,8 @@ export interface OverlayField {
   key: string; // unique within this form — used as lookup key in the values map
   x: number; // x coordinate in PDF points, bottom-left origin
   y: number; // y coordinate in PDF points
+  width: number; // annotation box width in PDF points for box-aware alignment
+  height: number; // annotation box height in PDF points for box-aware alignment
   size?: number; // font size override (default: 9pt)
   labelEn?: string; // English label for review UIs
   labelJa?: string; // Japanese label for review UIs

@@ -43,6 +43,10 @@ function expectValidField(field: OverlayField) {
   expect(isNonEmptyString(field.key)).toBe(true);
   expect(Number.isFinite(field.x)).toBe(true);
   expect(Number.isFinite(field.y)).toBe(true);
+  expect(Number.isFinite(field.width)).toBe(true);
+  expect(field.width).toBeGreaterThan(0);
+  expect(Number.isFinite(field.height)).toBe(true);
+  expect(field.height).toBeGreaterThan(0);
 }
 
 function expectValidVariant(variant: FormVariant) {

@@ -1,6 +1,6 @@
 {
   "name": "jp-form-kit",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "TypeScript schema library and PDF overlay toolkit for Japanese government forms",
   "type": "module",
   "main": "./dist/index.js",

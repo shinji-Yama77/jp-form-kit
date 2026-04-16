@@ -19,6 +19,7 @@ const BUNDLED_FONT_PATH = join(
 );
 
 const DEFAULT_FONT_SIZE = 9;
+const DEFAULT_X_PADDING = 2;
 
 export interface RenderOptions {
   /**
@@ -108,10 +109,17 @@ export async function renderOverlayPdf(
   for (const field of activeFields) {
     const value = values[field.key] ?? "";
     if (!value) continue;
+    const fontSize = field.size ?? DEFAULT_FONT_SIZE;
+    const drawX =
+      field.width !== undefined ? field.x + DEFAULT_X_PADDING : field.x;
+    const drawY =
+      field.height !== undefined
+        ? field.y + Math.max((field.height - fontSize) / 2, 1)
+        : field.y;
     page.drawText(value, {
-      x: field.x,
-      y: field.y,
-      size: field.size ?? DEFAULT_FONT_SIZE,
+      x: drawX,
+      y: drawY,
+      size: fontSize,
       font,
     });
   }
